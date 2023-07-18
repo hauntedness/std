@@ -16,6 +16,13 @@ func From[T any](value T, isPresent bool) Option[T] {
 	}
 }
 
+func OrElse[T any](ok bool, value T, other T) T {
+	if ok {
+		return value
+	}
+	return other
+}
+
 func Some[T any](value T) Option[T] {
 	return Option[T]{
 		value:     value,
