@@ -21,7 +21,7 @@ func From[T any](value T, err error) Result[T] {
 	}
 }
 
-func Must[T any](err error, value T) T {
+func Must[T any](value T, err error) T {
 	if err != nil {
 		panic(err)
 	}

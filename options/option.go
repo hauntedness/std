@@ -28,7 +28,7 @@ func OrElse[T any](ok bool, value T, other T) T {
 	return other
 }
 
-func Must[T any](ok bool, value T) T {
+func Must[T any](value T, ok bool) T {
 	if ok {
 		return value
 	}
