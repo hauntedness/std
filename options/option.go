@@ -4,6 +4,11 @@ import (
 	"errors"
 )
 
+var (
+	ErrNotPresent = errors.New("value not present")
+	ErrNotOk      = errors.New("not ok")
+)
+
 type Option[T any] struct {
 	value     T
 	isPresent bool
@@ -23,6 +28,13 @@ func OrElse[T any](ok bool, value T, other T) T {
 	return other
 }
 
+func Must[T any](ok bool, value T) T {
+	if ok {
+		return value
+	}
+	panic(ErrNotOk)
+}
+
 func Some[T any](value T) Option[T] {
 	return Option[T]{
 		value:     value,
@@ -37,8 +49,6 @@ func Empty[T any]() Option[T] {
 		isPresent: false,
 	}
 }
-
-var ErrNotPresent = errors.New("value not present")
 
 func (o Option[T]) Get() T {
 	if !o.isPresent {

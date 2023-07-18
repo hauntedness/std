@@ -21,6 +21,13 @@ func From[T any](value T, err error) Result[T] {
 	}
 }
 
+func Must[T any](err error, value T) T {
+	if err != nil {
+		panic(err)
+	}
+	return value
+}
+
 func Ok[T any](value T) Result[T] {
 	return Result[T]{
 		value: value,
