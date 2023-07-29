@@ -6,7 +6,7 @@ import (
 
 var (
 	ErrNotPresent = errors.New("value not present")
-	ErrNotOk      = errors.New("not ok")
+	ErrNotOk      = errors.New("value not ok")
 )
 
 type Option[T any] struct {
