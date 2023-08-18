@@ -10,16 +10,36 @@ type CallerOption int
 
 const (
 	// apply function name to result
-	WithoutFunctionName CallerOption = 1 << iota
+	CallerWithoutFunctionName CallerOption = 1 << iota
 	// apply file path to result
-	WithFilePath
+	CallerWithFilePath
 )
 
 // Caller return file and line number information
 // based on [runtime.Caller]
 // but in string form with at most 3-tier directories
 func Caller(options ...CallerOption) string {
-	return CallerSkip(1, options...)
+	var option CallerOption
+	for _, op := range options {
+		option |= op
+	}
+	pc, file, line, _ := runtime.Caller(1)
+	buf := &strings.Builder{}
+	// apply function name to result
+	if option&CallerWithoutFunctionName != CallerWithoutFunctionName {
+		fn := runtime.FuncForPC(pc)
+		if fn != nil {
+			buf.WriteString(fn.Name())
+			buf.WriteByte(':')
+		}
+	}
+	// apply file path to result
+	if option&CallerWithFilePath == CallerWithFilePath {
+		writeTrimmedPath(buf, file)
+		buf.WriteByte(':')
+	}
+	buf.WriteString(strconv.Itoa(line))
+	return buf.String()
 }
 
 // CallerSkip is similar to Caller but with skip specified
@@ -33,7 +53,7 @@ func CallerSkip(skip int, options ...CallerOption) string {
 	pc, file, line, _ := runtime.Caller(skip)
 	buf := &strings.Builder{}
 	// apply function name to result
-	if option&WithoutFunctionName != WithoutFunctionName {
+	if option&CallerWithoutFunctionName != CallerWithoutFunctionName {
 		fn := runtime.FuncForPC(pc)
 		if fn != nil {
 			buf.WriteString(fn.Name())
@@ -41,7 +61,7 @@ func CallerSkip(skip int, options ...CallerOption) string {
 		}
 	}
 	// apply file path to result
-	if option&WithFilePath == WithFilePath {
+	if option&CallerWithFilePath == CallerWithFilePath {
 		writeTrimmedPath(buf, file)
 		buf.WriteByte(':')
 	}
