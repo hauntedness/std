@@ -21,6 +21,16 @@ func From[T any](value T, isPresent bool) Option[T] {
 	}
 }
 
+func FromPointer[T any](pointer *T) Option[T] {
+	if pointer == nil {
+		return Empty[T]()
+	}
+	return Option[T]{
+		value:     *pointer,
+		isPresent: true,
+	}
+}
+
 func OrElse[T any](ok bool, value T, other T) T {
 	if ok {
 		return value
