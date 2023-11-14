@@ -76,7 +76,7 @@ func NmSkip(skip int) string {
 func Path() string {
 	_, file, line, _ := runtime.Caller(1)
 	buf := &strings.Builder{}
-	writeTrimmedPath(buf, file)
+	buf.WriteString(file)
 	buf.WriteByte(':')
 	buf.WriteString(strconv.Itoa(line))
 	return buf.String()
@@ -84,8 +84,20 @@ func Path() string {
 
 // PathSkip is similar to [Path] but with skip specified
 //
-//	note: Path(1) is equivalent to runtime.Caller(0)
+//	note: PathSkip(1) is equivalent to runtime.Caller(0)
 func PathSkip(skip int) string {
+	_, file, line, _ := runtime.Caller(skip)
+	buf := &strings.Builder{}
+	buf.WriteString(file)
+	buf.WriteByte(':')
+	buf.WriteString(strconv.Itoa(line))
+	return buf.String()
+}
+
+// ShortPathSkip is similar to [PathSkip] but in short string form
+//
+//	note: ShortPathSkip(1) is equivalent to runtime.Caller(0)
+func ShortPathSkip(skip int) string {
 	_, file, line, _ := runtime.Caller(skip)
 	buf := &strings.Builder{}
 	writeTrimmedPath(buf, file)
