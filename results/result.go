@@ -15,8 +15,7 @@ func From[T any](value T, err error) Result[T] {
 }
 
 // Catch map the result of f, wrap panic as error
-func Catch[T any](f func() T) Result[T] {
-	var result Result[T]
+func Catch[T any](f func() T) (result Result[T]) {
 	defer func() {
 		if v := recover(); v != nil {
 			if err, ok := v.(error); ok {
@@ -31,8 +30,7 @@ func Catch[T any](f func() T) Result[T] {
 }
 
 // CatchE is similar to Catch, but also accept error
-func CatchE[T any](f func() (T, error)) Result[T] {
-	var result Result[T]
+func CatchE[T any](f func() (T, error)) (result Result[T]) {
 	defer func() {
 		if v := recover(); v != nil {
 			if err, ok := v.(error); ok {
