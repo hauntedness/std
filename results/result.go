@@ -1,13 +1,6 @@
 package results
 
-import (
-	"errors"
-)
-
-var (
-	ErrResultNilError = errors.New("error is nil")
-	ErrResultHasError = errors.New("result has error")
-)
+import "fmt"
 
 type Result[T any] struct {
 	value T
@@ -19,6 +12,38 @@ func From[T any](value T, err error) Result[T] {
 		value: value,
 		err:   err,
 	}
+}
+
+// Catch map the result of f, wrap panic as error
+func Catch[T any](f func() T) Result[T] {
+	var result Result[T]
+	defer func() {
+		if v := recover(); v != nil {
+			if err, ok := v.(error); ok {
+				result = Err[T](err)
+			} else {
+				result = Err[T](fmt.Errorf("%v", v))
+			}
+		}
+	}()
+	result = Ok(f())
+	return result
+}
+
+// CatchE is similar to Catch, but also accept error
+func CatchE[T any](f func() (T, error)) Result[T] {
+	var result Result[T]
+	defer func() {
+		if v := recover(); v != nil {
+			if err, ok := v.(error); ok {
+				result = Err[T](err)
+			} else {
+				result = Err[T](fmt.Errorf("%v", v))
+			}
+		}
+	}()
+	result = From(f())
+	return result
 }
 
 func Must[T any](value T, err error) T {
@@ -37,7 +62,7 @@ func Ok[T any](value T) Result[T] {
 
 func Err[T any](err error) Result[T] {
 	if err == nil {
-		panic(ErrResultNilError)
+		panic("error is nil")
 	}
 	var value T
 	return Result[T]{
@@ -48,7 +73,7 @@ func Err[T any](err error) Result[T] {
 
 func (r Result[T]) Get() T {
 	if r.err != nil {
-		panic(ErrResultHasError)
+		panic(r.err)
 	}
 	return r.value
 }
@@ -72,6 +97,13 @@ func (r Result[T]) OrEmpty() T {
 	if r.err != nil {
 		var other T
 		return other
+	}
+	return r.value
+}
+
+func (r Result[T]) OrFrom(fn func() T) T {
+	if r.err != nil {
+		return fn()
 	}
 	return r.value
 }
