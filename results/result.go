@@ -14,19 +14,19 @@ func From[T any](value T, err error) Result[T] {
 	}
 }
 
-// Try call func f, return Ok[bool] if no panic, return Err[bool] if panic
-func Try(f func()) (result Result[bool]) {
+// Try call func f, return Ok[struct{}] if no panic, return Err[struct{}] if panic
+func Try(f func()) (result Result[struct{}]) {
 	defer func() {
 		if v := recover(); v != nil {
 			if err, ok := v.(error); ok {
-				result = Err[bool](err)
+				result = Err[struct{}](err)
 			} else {
-				result = Err[bool](fmt.Errorf("%v", v))
+				result = Err[struct{}](fmt.Errorf("%v", v))
 			}
 		}
 	}()
 	f()
-	result = Ok(true)
+	result = Ok(struct{}{})
 	return result
 }
 
