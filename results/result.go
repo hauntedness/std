@@ -14,23 +14,8 @@ func From[T any](value T, err error) Result[T] {
 	}
 }
 
-// Try map the result of f, wrap panic as error
-func Try[T any](f func() T) (result Result[T]) {
-	defer func() {
-		if v := recover(); v != nil {
-			if err, ok := v.(error); ok {
-				result = Err[T](err)
-			} else {
-				result = Err[T](fmt.Errorf("%v", v))
-			}
-		}
-	}()
-	result = Ok(f())
-	return result
-}
-
-// Try0 is similar to Try, but return Ok[bool]
-func Try0(f func()) (result Result[bool]) {
+// Try call func f, return Ok[bool] if no panic, return Err[bool] if panic
+func Try(f func()) (result Result[bool]) {
 	defer func() {
 		if v := recover(); v != nil {
 			if err, ok := v.(error); ok {
@@ -45,8 +30,23 @@ func Try0(f func()) (result Result[bool]) {
 	return result
 }
 
-// TryE is similar to Try, but also accept error
-func TryE[T any](f func() (T, error)) (result Result[T]) {
+// Try1 is similar to Try, but accepts func() T
+func Try1[T any](f func() T) (result Result[T]) {
+	defer func() {
+		if v := recover(); v != nil {
+			if err, ok := v.(error); ok {
+				result = Err[T](err)
+			} else {
+				result = Err[T](fmt.Errorf("%v", v))
+			}
+		}
+	}()
+	result = Ok(f())
+	return result
+}
+
+// Try3 is similar to Try, but accepts func() (T, error)
+func Try2[T any](f func() (T, error)) (result Result[T]) {
 	defer func() {
 		if v := recover(); v != nil {
 			if err, ok := v.(error); ok {
