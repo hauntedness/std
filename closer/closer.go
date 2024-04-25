@@ -6,7 +6,7 @@ type Closable interface {
 	Close() error
 }
 
-func AfterFunc[T Closable](t Closable, f func(t Closable) error) (err error) {
+func AfterFunc[T Closable](t T, f func(t T) error) (err error) {
 	defer func() {
 		closeerr := t.Close()
 		if closeerr != nil {
