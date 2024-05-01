@@ -1,6 +1,7 @@
 package caller
 
 import (
+	"bytes"
 	"runtime"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ import (
 // based on [runtime.Caller]
 func Name() string {
 	pc, _, line, _ := runtime.Caller(1)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	// apply function name to result
 	fn := runtime.FuncForPC(pc)
 	if fn != nil {
@@ -27,7 +28,7 @@ func Name() string {
 //	note: NameSkip(1) is equivalent to runtime.Caller(0)
 func NameSkip(skip int) string {
 	pc, _, line, _ := runtime.Caller(skip)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	// apply function name to result
 	fn := runtime.FuncForPC(pc)
 	if fn != nil {
@@ -43,7 +44,7 @@ func NameSkip(skip int) string {
 // based on [runtime.Caller]
 func Nm() string {
 	pc, _, line, _ := runtime.Caller(1)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	// apply function name to result
 	fn := runtime.FuncForPC(pc)
 	if fn != nil {
@@ -59,7 +60,7 @@ func Nm() string {
 //	note: NmSkip(1) is equivalent to runtime.Caller(0)
 func NmSkip(skip int) string {
 	pc, _, line, _ := runtime.Caller(skip)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	// apply function name to result
 	fn := runtime.FuncForPC(pc)
 	if fn != nil {
@@ -75,7 +76,7 @@ func NmSkip(skip int) string {
 //	note: Path(1) is equivalent to runtime.Caller(0)
 func Path() string {
 	_, file, line, _ := runtime.Caller(1)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	buf.WriteString(file)
 	buf.WriteByte(':')
 	buf.WriteString(strconv.Itoa(line))
@@ -87,7 +88,7 @@ func Path() string {
 //	note: PathSkip(1) is equivalent to runtime.Caller(0)
 func PathSkip(skip int) string {
 	_, file, line, _ := runtime.Caller(skip)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	buf.WriteString(file)
 	buf.WriteByte(':')
 	buf.WriteString(strconv.Itoa(line))
@@ -99,7 +100,7 @@ func PathSkip(skip int) string {
 //	note: ShortPathSkip(1) is equivalent to runtime.Caller(0)
 func ShortPathSkip(skip int) string {
 	_, file, line, _ := runtime.Caller(skip)
-	buf := &strings.Builder{}
+	buf := &bytes.Buffer{}
 	writeTrimmedPath(buf, file)
 	buf.WriteByte(':')
 	buf.WriteString(strconv.Itoa(line))
@@ -107,7 +108,7 @@ func ShortPathSkip(skip int) string {
 }
 
 // writeTrimmedPath write path with at most 3-tier directories
-func writeTrimmedPath(buf *strings.Builder, path string) {
+func writeTrimmedPath(buf *bytes.Buffer, path string) {
 	idx := strings.LastIndexByte(path, '/')
 	if idx == -1 {
 		buf.WriteString(path)
