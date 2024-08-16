@@ -4,40 +4,48 @@ import (
 	"sync"
 )
 
-// WaitAll Wrap [sync.WaitGroup]
-//
-// note that you should not break the loop func
-func WaitAll(total int) func(yield func(i int) bool) {
-	return func(yield func(i int) bool) {
-		wg := &sync.WaitGroup{}
-		wg.Add(total)
-		for i := range total {
-			go func() {
-				defer wg.Done()
-				yield(i)
-			}()
-		}
-		wg.Wait()
-	}
+type latch struct {
+	total int
 }
 
-// WaitAllWithLimitG is similar to WaitAll but also limits the number of active goroutines in this group to at most limit.
-func WaitAllWithLimitG(total int, limit int) func(yield func(i int) bool) {
-	return func(yield func(i int) bool) {
-		ch := make(chan struct{}, limit)
-		wg := &sync.WaitGroup{}
-		wg.Add(total)
-		for i := range total {
-			ch <- struct{}{}
-			go func() {
-				defer func() {
-					wg.Done()
-					<-ch
-				}()
-				yield(i)
-			}()
-		}
-		wg.Wait()
-		close(ch)
+func Latch(total int) latch {
+	return latch{total: total}
+}
+
+func (l latch) ForEach(f func()) {
+	wg := &sync.WaitGroup{}
+	wg.Add(l.total)
+	for range l.total {
+		go func() {
+			defer wg.Done()
+			f()
+		}()
 	}
+	wg.Wait()
+}
+
+type latch2 struct {
+	total     int
+	parallism int
+}
+
+func Latch2(total, parallism int) latch2 {
+	return latch2{total: total, parallism: parallism}
+}
+
+func (l latch2) ForEach(f func()) {
+	wg := &sync.WaitGroup{}
+	ch := make(chan struct{}, l.parallism)
+	wg.Add(l.total)
+	for range l.total {
+		ch <- struct{}{}
+		go func() {
+			defer func() {
+				<-ch
+				wg.Done()
+			}()
+			f()
+		}()
+	}
+	wg.Wait()
 }

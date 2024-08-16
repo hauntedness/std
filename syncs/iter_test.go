@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-func TestWaitAll(t *testing.T) {
+func TestLatch2(t *testing.T) {
 	start := time.Now()
-	for i := range WaitAllWithLimitG(7, 3) {
+	Latch2(7, 3).ForEach(func() {
 		time.Sleep(time.Second * 1)
-		fmt.Println(i)
-	}
+		fmt.Println(1)
+	})
 	duration := time.Since(start)
 	if sec := duration.Seconds(); int(sec) != 3 {
 		t.Fatalf("should take around 3 seconds, actual take %v seconds", sec)
