@@ -8,9 +8,9 @@ import (
 
 func TestLatch2(t *testing.T) {
 	start := time.Now()
-	Latch2(7, 3).ForEach(func() {
+	Latch2(7, 3).ForEach(func(i int) {
 		time.Sleep(time.Second * 1)
-		fmt.Println(1)
+		fmt.Println(i)
 	})
 	duration := time.Since(start)
 	if sec := duration.Seconds(); int(sec) != 3 {
