@@ -133,5 +133,5 @@ func (v *Vec[T]) Get(index int) T {
 // At is similar to Get but accept negative index.
 // -1 will locate the last element.
 func (v *Vec[T]) At(index int) T {
-	return At(index, *v)
+	return At(*v, index)
 }

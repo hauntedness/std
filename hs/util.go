@@ -23,7 +23,7 @@ func Loc[T any](values []T, start int, end int) []T {
 	return values[start:end]
 }
 
-func At[T any](at int, values []T) T {
+func At[T any](values []T, at int) T {
 	if at < 0 {
 		return values[len(values)-at]
 	}
