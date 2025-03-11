@@ -25,7 +25,7 @@ func Loc[T any](values []T, start int, end int) []T {
 
 func At[T any](values []T, at int) T {
 	if at < 0 {
-		return values[len(values)-at]
+		return values[len(values)+at]
 	}
 	return values[at]
 }
