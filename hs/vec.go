@@ -43,9 +43,9 @@ func (v *Vec[T]) Seq() iter.Seq[T] {
 }
 
 func (v *Vec[T]) Reduce(initial T, fn func(a, b T) T) T {
-	_ = *v
-	for i := range *v {
-		initial = fn(initial, (*v)[i])
+	data := *v
+	for i := range data {
+		initial = fn(initial, data[i])
 	}
 	return initial
 }
@@ -55,17 +55,16 @@ func (v *Vec[T]) Data() []T {
 }
 
 func (v *Vec[T]) Append(data ...T) *Vec[T] {
-	_ = *v
 	*v = slices.Concat(*v, data)
 	return v
 }
 
 // Pipe create a new Vec, the new element depends on the results of fn
 func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
-	_ = *v
-	res := make([]T, 0, len(*v))
-	for i := range *v {
-		if nv, ok := fn((*v)[i]); ok {
+	data := *v
+	res := make([]T, 0, len(data))
+	for i := range data {
+		if nv, ok := fn(data[i]); ok {
 			res = append(res, nv)
 		}
 	}
@@ -91,7 +90,6 @@ func (v *Vec[T]) Loc(start, end int) *Vec[T] {
 // Equal compare each element, and return true if all the same.
 // use hs.Eq for convenience.
 func (v *Vec[T]) Equal(other *Vec[T], eq func(a T, b T) bool) bool {
-	_ = *other
 	return slices.EqualFunc(*v, *other, eq)
 }
 
