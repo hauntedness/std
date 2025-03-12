@@ -72,7 +72,7 @@ func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
 	return New(res)
 }
 
-func (v *Vec[T]) Clone(other Vec[T]) *Vec[T] {
+func (v *Vec[T]) Clone() *Vec[T] {
 	return New(slices.Clone(*v))
 }
 
