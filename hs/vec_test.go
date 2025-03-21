@@ -2,6 +2,7 @@ package hs_test
 
 import (
 	"cmp"
+	"fmt"
 	"testing"
 
 	"github.com/hauntedness/std/hs"
@@ -68,4 +69,16 @@ func TestVec_Pipe(t *testing.T) {
 	if !vec1.Equal((*hs.Vec[int])(&expected), hs.Eq) {
 		t.Fatal("Pipe failed.")
 	}
+}
+
+func TestString(t *testing.T) {
+	vec := hs.NewWith(1, 2, 3, 4, 5, 6)
+	if vec.String() != fmt.Sprint(&[]int{1, 2, 3, 4, 5, 6}) {
+		t.Fatalf("String failed.")
+	}
+	vec = nil
+	if vec.String() != fmt.Sprint((*[]int)(nil)) {
+		t.Fatalf("String failed.")
+	}
+	_ = vec.String()
 }

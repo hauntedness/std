@@ -1,6 +1,7 @@
 package hs
 
 import (
+	"fmt"
 	"iter"
 	"slices"
 )
@@ -34,8 +35,9 @@ func Repeat[T any](v T, count int) *Vec[T] {
 
 func (v *Vec[T]) Seq() iter.Seq[T] {
 	return func(yield func(T) bool) {
-		for i := range *v {
-			if !yield((*v)[i]) {
+		data := *v
+		for i := range data {
+			if !yield(data[i]) {
 				return
 			}
 		}
@@ -132,4 +134,8 @@ func (v *Vec[T]) Get(index int) T {
 // -1 will locate the last element.
 func (v *Vec[T]) At(index int) T {
 	return At(*v, index)
+}
+
+func (v *Vec[T]) String() string {
+	return fmt.Sprint((*[]T)(v))
 }
