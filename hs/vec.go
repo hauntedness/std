@@ -95,6 +95,22 @@ func (v *Vec[T]) Equal(other *Vec[T], eq func(a T, b T) bool) bool {
 	return slices.EqualFunc(*v, *other, eq)
 }
 
+// Contains reports whether at least one element elem of v satisfies eq(elem, input).
+// use hs.Eq for convenience.
+func (v *Vec[T]) Contains(input T, eq func(elem T, input T) bool) bool {
+	return slices.ContainsFunc(*v, func(elem T) bool {
+		return eq(elem, input)
+	})
+}
+
+// Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
+// use hs.Eq for convenience.
+func (v *Vec[T]) Index(input T, eq func(elem T, input T) bool) int {
+	return slices.IndexFunc(*v, func(elem T) bool {
+		return eq(elem, input)
+	})
+}
+
 // Sort sorts the slice x in ascending order as determined by the cmp function.
 func (v *Vec[T]) Sort(cmp func(a T, b T) int) *Vec[T] {
 	slices.SortFunc(*v, cmp)

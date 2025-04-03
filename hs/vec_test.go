@@ -61,13 +61,37 @@ func TestVec_BinarySearch(t *testing.T) {
 }
 
 func TestVec_Pipe(t *testing.T) {
-	vec0 := hs.NewWith(1, 2, 3, 4, 5, 6)
-	vec1 := vec0.Pipe(func(i int) (int, bool) {
+	vec := hs.NewWith(1, 2, 3, 4, 5, 6)
+	vec = vec.Pipe(func(i int) (int, bool) {
 		return i + 1, true
 	})
 	expected := []int{2, 3, 4, 5, 6, 7}
-	if !vec1.Equal((*hs.Vec[int])(&expected), hs.Eq) {
+	if !vec.Equal((*hs.Vec[int])(&expected), hs.Eq) {
 		t.Fatal("Pipe failed.")
+	}
+}
+
+func TestVec_Contains(t *testing.T) {
+	vec := hs.NewWith(1, 2, 3, 4, 5, 6)
+	ok := vec.Contains(3, hs.Eq)
+	if !ok {
+		t.Fatal("Contains failed.")
+	}
+	ok = vec.Contains(8, hs.Eq)
+	if ok {
+		t.Fatal("Contains failed.")
+	}
+}
+
+func TestVec_Index(t *testing.T) {
+	vec := hs.New([]any{1, 2, 3, 4, 5, "6"})
+	index := vec.Index("6", hs.Eq)
+	if index < 0 {
+		t.Fatal("Index failed.")
+	}
+	index = vec.Index(6, hs.Eq)
+	if index > 0 {
+		t.Fatal("Index failed.")
 	}
 }
 
@@ -80,5 +104,4 @@ func TestString(t *testing.T) {
 	if vec.String() != fmt.Sprint((*[]int)(nil)) {
 		t.Fatalf("String failed.")
 	}
-	_ = vec.String()
 }

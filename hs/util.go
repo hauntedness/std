@@ -29,3 +29,25 @@ func At[T any](values []T, at int) T {
 	}
 	return values[at]
 }
+
+// Map apply fn on each element of values []T and return the transformed []R.
+func Map[T any, R any](values []T, fn func(T) R) []R {
+	r := make([]R, len(values))
+	for i := range values {
+		r[i] = fn(values[i])
+	}
+	return r
+}
+
+// Pipe is filter + map from []T to []R.
+//
+//	Pipe does NOT removes unused capacity, call slices.Clip by your self if needed.
+func Pipe[T any, R any](values []T, fn func(T) (R, bool)) []R {
+	r := make([]R, 0, len(values))
+	for i := range values {
+		if v, ok := fn(values[i]); ok {
+			r = append(r, v)
+		}
+	}
+	return r
+}
