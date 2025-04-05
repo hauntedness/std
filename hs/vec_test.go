@@ -73,12 +73,9 @@ func TestVec_Pipe(t *testing.T) {
 
 func TestVec_Contains(t *testing.T) {
 	vec := hs.NewWith(1, 2, 3, 4, 5, 6)
-	ok := vec.Contains(3, hs.Eq)
-	if !ok {
+	if !vec.Contains(hs.EqFunc(3)) {
 		t.Fatal("Contains failed.")
-	}
-	ok = vec.Contains(8, hs.Eq)
-	if ok {
+	} else if vec.Contains(hs.EqFunc(8)) {
 		t.Fatal("Contains failed.")
 	}
 }

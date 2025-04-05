@@ -4,6 +4,12 @@ func Eq[T comparable](a, b T) bool {
 	return a == b
 }
 
+func EqFunc[T comparable](a T) func(T) bool {
+	return func(t T) bool {
+		return a == t
+	}
+}
+
 // Loc return a slice from values, it accept negative index for start and end.
 //
 //	Loc([1,2,3], 1, -1) --> return [2]
