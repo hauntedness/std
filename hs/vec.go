@@ -103,10 +103,8 @@ func (v *Vec[T]) Contains(fn func(elem T) bool) bool {
 
 // Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
 // use hs.Eq for convenience.
-func (v *Vec[T]) Index(input T, eq func(elem T, input T) bool) int {
-	return slices.IndexFunc(*v, func(elem T) bool {
-		return eq(elem, input)
-	})
+func (v *Vec[T]) Index(fn func(elem T) bool) int {
+	return slices.IndexFunc(*v, fn)
 }
 
 // Sort sorts the slice x in ascending order as determined by the cmp function.

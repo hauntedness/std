@@ -82,11 +82,11 @@ func TestVec_Contains(t *testing.T) {
 
 func TestVec_Index(t *testing.T) {
 	vec := hs.New([]any{1, 2, 3, 4, 5, "6"})
-	index := vec.Index("6", hs.Eq)
+	index := vec.Index(hs.EqFunc(any("6")))
 	if index < 0 {
 		t.Fatal("Index failed.")
 	}
-	index = vec.Index(6, hs.Eq)
+	index = vec.Index(hs.EqFunc(any(6)))
 	if index > 0 {
 		t.Fatal("Index failed.")
 	}
