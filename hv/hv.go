@@ -26,16 +26,16 @@ func None[T any]() Option[T] {
 	}
 }
 
-// FromTuple builds a Some Option when second argument is true, or None.
-func FromTuple[T any](value T, ok bool) Option[T] {
+// From builds a Some Option when second argument is true, or None.
+func From[T any](value T, ok bool) Option[T] {
 	if ok {
 		return Some(value)
 	}
 	return None[T]()
 }
 
-// FromPointr builds a Some Option when value is not nil, or None.
-func FromPointr[T any](value *T) Option[T] {
+// FromPtr builds a Some Option when value is not nil, or None.
+func FromPtr[T any](value *T) Option[T] {
 	if value != nil {
 		return Some(*value)
 	}
@@ -90,8 +90,8 @@ func (o Option[T]) OrEmpty() T {
 	return o.value
 }
 
-// ToPointr returns value if present or a nil pointer.
-func (o Option[T]) ToPointr() *T {
+// ToPtr returns value if present or a nil pointer.
+func (o Option[T]) ToPtr() *T {
 	if !o.isPresent {
 		return nil
 	}
