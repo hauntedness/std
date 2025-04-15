@@ -11,33 +11,30 @@ import (
 //	Use *Vec instead of Vec
 //
 // The zero value is hard to use thus...
-type Vec[T any] []T
+type Vec[T any] struct {
+	data []T
+}
 
 func Make[T any](len, cap int) *Vec[T] {
-	ret := Vec[T](make([]T, len, cap))
-	return &ret
+	return &Vec[T]{data: make([]T, len, cap)}
 }
 
 func New[T any](data []T) *Vec[T] {
-	ret := Vec[T](data)
-	return &ret
+	return &Vec[T]{data: data}
 }
 
 func NewWith[T any](data ...T) *Vec[T] {
-	ret := Vec[T](data)
-	return &ret
+	return &Vec[T]{data: data}
 }
 
 func Repeat[T any](v T, count int) *Vec[T] {
-	ret := Vec[T](slices.Repeat([]T{v}, count))
-	return &ret
+	return &Vec[T]{data: slices.Repeat([]T{v}, count)}
 }
 
 func (v *Vec[T]) Seq() iter.Seq[T] {
 	return func(yield func(T) bool) {
-		data := *v
-		for i := range data {
-			if !yield(data[i]) {
+		for i := range v.data {
+			if !yield(v.data[i]) {
 				return
 			}
 		}
@@ -45,28 +42,26 @@ func (v *Vec[T]) Seq() iter.Seq[T] {
 }
 
 func (v *Vec[T]) Reduce(initial T, fn func(a, b T) T) T {
-	data := *v
-	for i := range data {
-		initial = fn(initial, data[i])
+	for i := range v.data {
+		initial = fn(initial, v.data[i])
 	}
 	return initial
 }
 
 func (v *Vec[T]) Data() []T {
-	return *v
+	return v.data
 }
 
 func (v *Vec[T]) Append(data ...T) *Vec[T] {
-	*v = slices.Concat(*v, data)
+	v.data = slices.Concat(v.data, data)
 	return v
 }
 
 // Pipe create a new Vec, the new element depends on the results of fn
 func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
-	data := *v
-	res := make([]T, 0, len(data))
-	for i := range data {
-		if nv, ok := fn(data[i]); ok {
+	res := make([]T, 0, len(v.data))
+	for i := range v.data {
+		if nv, ok := fn(v.data[i]); ok {
 			res = append(res, nv)
 		}
 	}
@@ -74,7 +69,7 @@ func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
 }
 
 func (v *Vec[T]) Clone() *Vec[T] {
-	return New(slices.Clone(*v))
+	return New(slices.Clone(v.data))
 }
 
 // Slice is just an alias to Loc.
@@ -86,68 +81,68 @@ func (v *Vec[T]) Slice(start, end int) *Vec[T] {
 
 // Loc return the sub slice from the original vec.
 func (v *Vec[T]) Loc(start, end int) *Vec[T] {
-	return New(Loc(*v, start, end))
+	return New(Loc(v.data, start, end))
 }
 
 // Equal compare each element, and return true if all the same.
 // use hs.Eq for convenience.
 func (v *Vec[T]) Equal(other *Vec[T], eq func(a T, b T) bool) bool {
-	return slices.EqualFunc(*v, *other, eq)
+	return slices.EqualFunc(v.data, other.data, eq)
 }
 
 // Contains reports whether at least one element elem of v satisfies eq(elem, input).
 // use hs.Eq for convenience.
 func (v *Vec[T]) Contains(fn func(elem T) bool) bool {
-	return slices.ContainsFunc(*v, fn)
+	return slices.ContainsFunc(v.data, fn)
 }
 
 // Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
 // use hs.Eq for convenience.
 func (v *Vec[T]) Index(fn func(elem T) bool) int {
-	return slices.IndexFunc(*v, fn)
+	return slices.IndexFunc(v.data, fn)
 }
 
 // Sort sorts the slice x in ascending order as determined by the cmp function.
 func (v *Vec[T]) Sort(cmp func(a T, b T) int) *Vec[T] {
-	slices.SortFunc(*v, cmp)
+	slices.SortFunc(v.data, cmp)
 	return v
 }
 
 // Reverse reverses the elements of the slice in place.
 func (v *Vec[T]) Reverse() *Vec[T] {
-	slices.Reverse(*v)
+	slices.Reverse(v.data)
 	return v
 }
 
 func (v *Vec[T]) IsSorted(cmp func(a T, b T) int) bool {
-	return slices.IsSortedFunc(*v, cmp)
+	return slices.IsSortedFunc(v.data, cmp)
 }
 
 // BinarySearch searches for target in a sorted slice and returns the earliest position where target is found.
 //
 // For more detail see: [slices.BinarySearch]
 func (v *Vec[T]) BinarySearch(target T, cmp func(a, b T) int) (pos int, ok bool) {
-	return slices.BinarySearchFunc(*v, target, cmp)
+	return slices.BinarySearchFunc(v.data, target, cmp)
 }
 
 func (v *Vec[T]) Len() int {
-	return len(*v)
+	return len(v.data)
 }
 
 func (v *Vec[T]) Set(i int, value T) {
-	(*v)[i] = value
+	v.data[i] = value
 }
 
 func (v *Vec[T]) Get(index int) T {
-	return (*v)[index]
+	return v.data[index]
 }
 
 // At is similar to Get but accept negative index.
 // -1 will locate the last element.
 func (v *Vec[T]) At(index int) T {
-	return At(*v, index)
+	return At(v.data, index)
 }
 
 func (v *Vec[T]) String() string {
-	return fmt.Sprint((*[]T)(v))
+	return fmt.Sprint(v.data)
 }

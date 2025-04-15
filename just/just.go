@@ -55,6 +55,14 @@ func TryGo(f func()) <-chan error {
 	return ch
 }
 
+// Want want to get value with no error or else panic.
+func Want[T any](value T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return value
+}
+
 type PanicError struct {
 	Value any
 }
