@@ -47,7 +47,7 @@ func Map[T any, R any](values []T, fn func(T) R) []R {
 
 // Pipe is filter + map from []T to []R.
 //
-//	Pipe does NOT removes unused capacity, call slices.Clip by your self if needed.
+// Pipe does NOT removes unused capacity, call [slices.Clip] by yourself if needed.
 func Pipe[T any, R any](values []T, fn func(T) (R, bool)) []R {
 	r := make([]R, 0, len(values))
 	for i := range values {
@@ -56,4 +56,17 @@ func Pipe[T any, R any](values []T, fn func(T) (R, bool)) []R {
 		}
 	}
 	return r
+}
+
+// PipeVec is filter + map from *Vec[T] to *Vec[R].
+//
+// PipeVec does NOT removes unused capacity, call [Clip] by yourself if needed.
+func PipeVec[T any, R any](values *Vec[T], fn func(T) (R, bool)) *Vec[R] {
+	r := make([]R, 0, len(values.data))
+	for i := range values.data {
+		if v, ok := fn(values.data[i]); ok {
+			r = append(r, v)
+		}
+	}
+	return &Vec[R]{data: r}
 }

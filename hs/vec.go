@@ -105,6 +105,15 @@ func (v *Vec[T]) Contains(fn func(elem T) bool) bool {
 	return slices.ContainsFunc(v.data, fn)
 }
 
+// Clip removes unused capacity from the (v *Vec[T]), underlying data become data[:len(s):len(s)].
+// return itself for convenience.
+//
+// see [slices.Clip].
+func (v *Vec[T]) Clip() *Vec[T] {
+	v.data = slices.Clip(v.data)
+	return v
+}
+
 // Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
 //
 // use [EqTo] for convenience.
