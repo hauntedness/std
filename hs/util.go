@@ -4,7 +4,7 @@ func Eq[T comparable](a, b T) bool {
 	return a == b
 }
 
-func EqualTo[T comparable](a T) func(T) bool {
+func EqTo[T comparable](a T) func(T) bool {
 	return func(t T) bool {
 		return a == t
 	}
