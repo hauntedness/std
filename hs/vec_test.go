@@ -94,7 +94,7 @@ func TestVec_Index(t *testing.T) {
 
 func TestString(t *testing.T) {
 	vec := hs.NewWith(1, 2, 3, 4, 5, 6)
-	if vec.String() != fmt.Sprint([]int{1, 2, 3, 4, 5, 6}) {
+	if vec.String() != fmt.Sprint(&[]int{1, 2, 3, 4, 5, 6}) {
 		t.Fatalf("String failed.")
 	}
 }

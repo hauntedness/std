@@ -52,12 +52,14 @@ func (v *Vec[T]) Data() []T {
 	return v.data
 }
 
+// Append append data to v.
+// see [slices.Concat].
 func (v *Vec[T]) Append(data ...T) *Vec[T] {
 	v.data = slices.Concat(v.data, data)
 	return v
 }
 
-// Pipe create a new Vec, the new element depends on the results of fn
+// Pipe create a new Vec, the new element depends on the results of fn.
 func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
 	res := make([]T, 0, len(v.data))
 	for i := range v.data {
@@ -68,6 +70,9 @@ func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
 	return New(res)
 }
 
+// Clone create shallow clone of v.
+//
+// underlying is [slices.Clone].
 func (v *Vec[T]) Clone() *Vec[T] {
 	return New(slices.Clone(v.data))
 }
@@ -85,26 +90,41 @@ func (v *Vec[T]) Loc(start, end int) *Vec[T] {
 }
 
 // Equal compare each element, and return true if all the same.
-// use hs.Eq for convenience.
+//
+// use [Eq] for convenience.
+// see [github.com/hauntedness/std/hs.Eq].
 func (v *Vec[T]) Equal(other *Vec[T], eq func(a T, b T) bool) bool {
 	return slices.EqualFunc(v.data, other.data, eq)
 }
 
 // Contains reports whether at least one element elem of v satisfies eq(elem, input).
-// use hs.Eq for convenience.
+//
+// use [EqTo] for convenience.
+// see [github.com/hauntedness/std/hs.EqTo].
 func (v *Vec[T]) Contains(fn func(elem T) bool) bool {
 	return slices.ContainsFunc(v.data, fn)
 }
 
 // Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
-// use hs.Eq for convenience.
+//
+// use [EqTo] for convenience.
+// see [github.com/hauntedness/std/hs.EqTo].
 func (v *Vec[T]) Index(fn func(elem T) bool) int {
 	return slices.IndexFunc(v.data, fn)
 }
 
 // Sort sorts the slice x in ascending order as determined by the cmp function.
+// This sort is not guaranteed to be stable.
 func (v *Vec[T]) Sort(cmp func(a T, b T) int) *Vec[T] {
 	slices.SortFunc(v.data, cmp)
+	return v
+}
+
+// SortStable sorts the slice x in ascending order as determined by the cmp function.
+//
+// SortStable keeping the original order of equal elements.
+func (v *Vec[T]) SortStable(cmp func(a T, b T) int) *Vec[T] {
+	slices.SortStableFunc(v.data, cmp)
 	return v
 }
 
@@ -121,6 +141,8 @@ func (v *Vec[T]) IsSorted(cmp func(a T, b T) int) bool {
 // BinarySearch searches for target in a sorted slice and returns the earliest position where target is found.
 //
 // For more detail see: [slices.BinarySearch]
+//
+// use [cmp.Compare] for convenience.
 func (v *Vec[T]) BinarySearch(target T, cmp func(a, b T) int) (pos int, ok bool) {
 	return slices.BinarySearchFunc(v.data, target, cmp)
 }
@@ -138,11 +160,12 @@ func (v *Vec[T]) Get(index int) T {
 }
 
 // At is similar to Get but accept negative index.
+//
 // -1 will locate the last element.
 func (v *Vec[T]) At(index int) T {
 	return At(v.data, index)
 }
 
 func (v *Vec[T]) String() string {
-	return fmt.Sprint(v.data)
+	return "&" + fmt.Sprint(v.data)
 }
