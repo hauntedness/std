@@ -1,5 +1,7 @@
 package hs
 
+import "slices"
+
 func Eq[T comparable](a, b T) bool {
 	return a == b
 }
@@ -69,4 +71,9 @@ func PipeVec[T any, R any](values *Vec[T], fn func(T) (R, bool)) *Vec[R] {
 		}
 	}
 	return &Vec[R]{data: r}
+}
+
+// Contains Contains reports whether value is present in values.
+func Contains[T comparable](value T, values ...T) bool {
+	return slices.Contains(values, value)
 }
