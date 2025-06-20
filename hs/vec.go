@@ -23,8 +23,13 @@ func New[T any](data []T) *Vec[T] {
 	return &Vec[T]{data: data}
 }
 
-func NewWith[T any](data ...T) *Vec[T] {
+func Of[T any](data ...T) *Vec[T] {
 	return &Vec[T]{data: data}
+}
+
+// Deprecated: use Of
+func NewWith[T any](data ...T) *Vec[T] {
+	return Of(data...)
 }
 
 func Repeat[T any](v T, count int) *Vec[T] {
