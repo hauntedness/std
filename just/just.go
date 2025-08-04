@@ -63,6 +63,13 @@ func Want[T any](value T, err error) T {
 	return value
 }
 
+// Check check no error or else panic.
+func Check(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 type PanicError struct {
 	Value any
 }
