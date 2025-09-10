@@ -77,3 +77,21 @@ func PipeVec[T any, R any](values *Vec[T], fn func(T) (R, bool)) *Vec[R] {
 func Contains[T comparable](value T, values ...T) bool {
 	return slices.Contains(values, value)
 }
+
+func Distinct[T comparable](v []T) []T {
+	if len(v) == 0 {
+		return nil
+	}
+	// Use a map to track seen elements
+	seen := make(map[T]struct{})
+	res := make([]T, 0, len(v))
+
+	for _, val := range v {
+		if _, ok := seen[val]; !ok {
+			seen[val] = struct{}{}
+			res = append(res, val)
+		}
+	}
+
+	return res
+}

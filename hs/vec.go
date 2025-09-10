@@ -119,6 +119,23 @@ func (v *Vec[T]) Clip() *Vec[T] {
 	return v
 }
 
+// Distinct return distincted values based on func eq.
+//
+// it doesn't modify the original slice.
+func (v *Vec[T]) Distinct(eq func(a T, b T) bool) *Vec[T] {
+	if len(v.data) == 0 {
+		return &Vec[T]{}
+	}
+	data := slices.Clone(v.data)
+	slices.SortFunc(data, func(a T, b T) int {
+		if eq(a, b) {
+			return 0
+		}
+		return -1
+	})
+	return &Vec[T]{data: slices.CompactFunc(data, eq)}
+}
+
 // Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
 //
 // use [EqTo] for convenience.
