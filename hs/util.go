@@ -95,3 +95,21 @@ func Distinct[T comparable](v []T) []T {
 
 	return res
 }
+
+func DistinctBy[T any, K comparable](v []T, key func(T) K) []T {
+	if len(v) == 0 {
+		return nil
+	}
+	// Use a map to track seen elements
+	seen := make(map[K]struct{})
+	res := make([]T, 0, len(v))
+
+	for _, val := range v {
+		if _, ok := seen[key(val)]; !ok {
+			seen[key(val)] = struct{}{}
+			res = append(res, val)
+		}
+	}
+
+	return res
+}
