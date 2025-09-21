@@ -105,8 +105,9 @@ func DistinctBy[T any, K comparable](v []T, key func(*T) K) []T {
 	res := make([]T, 0, len(v))
 
 	for _, val := range v {
-		if _, ok := seen[key(&val)]; !ok {
-			seen[key(&val)] = struct{}{}
+		k := key(&val)
+		if _, ok := seen[k]; !ok {
+			seen[k] = struct{}{}
 			res = append(res, val)
 		}
 	}
