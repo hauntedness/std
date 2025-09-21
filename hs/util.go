@@ -96,7 +96,7 @@ func Distinct[T comparable](v []T) []T {
 	return res
 }
 
-func DistinctBy[T any, K comparable](v []T, key func(T) K) []T {
+func DistinctBy[T any, K comparable](v []T, key func(*T) K) []T {
 	if len(v) == 0 {
 		return nil
 	}
@@ -105,8 +105,8 @@ func DistinctBy[T any, K comparable](v []T, key func(T) K) []T {
 	res := make([]T, 0, len(v))
 
 	for _, val := range v {
-		if _, ok := seen[key(val)]; !ok {
-			seen[key(val)] = struct{}{}
+		if _, ok := seen[key(&val)]; !ok {
+			seen[key(&val)] = struct{}{}
 			res = append(res, val)
 		}
 	}
