@@ -60,10 +60,21 @@ func (f Frame) pc() uintptr { return uintptr(f) - 1 }
 func (f Frame) file() string {
 	fn := runtime.FuncForPC(f.pc())
 	if fn == nil {
-		return "unknown"
+		return unknown
 	}
 	file, _ := fn.FileLine(f.pc())
 	return file
+}
+
+const unknown = "unknown"
+
+func (f Frame) fileAndName() (string, string) {
+	fn := runtime.FuncForPC(f.pc())
+	if fn == nil {
+		return unknown, unknown
+	}
+	file, _ := fn.FileLine(f.pc())
+	return file, fn.Name()
 }
 
 // line returns the line number of source code of the
@@ -81,7 +92,7 @@ func (f Frame) line() int {
 func (f Frame) name() string {
 	fn := runtime.FuncForPC(f.pc())
 	if fn == nil {
-		return "unknown"
+		return unknown
 	}
 	return fn.Name()
 }
@@ -103,9 +114,10 @@ func (f Frame) Format(s fmt.State, verb rune) {
 	case 's':
 		switch {
 		case s.Flag('+'):
-			io.WriteString(s, f.name())
+			file, name := f.fileAndName()
+			io.WriteString(s, name)
 			io.WriteString(s, "\n\t")
-			io.WriteString(s, f.file())
+			io.WriteString(s, file)
 		default:
 			io.WriteString(s, path.Base(f.file()))
 		}
@@ -124,7 +136,7 @@ func (f Frame) Format(s fmt.State, verb rune) {
 // same as that of fmt.Sprintf("%+v", f), but without newlines or tabs.
 func (f Frame) MarshalText() ([]byte, error) {
 	name := f.name()
-	if name == "unknown" {
+	if name == unknown {
 		return []byte(name), nil
 	}
 	return fmt.Appendf([]byte("%s %s:%d"), name, f.file(), f.line()), nil
