@@ -1,50 +1,16 @@
 package fmts
 
 import (
-	"bytes"
 	"fmt"
-	"runtime"
-	"strconv"
 )
 
 func Error(err error) error {
-	pc, _, line, _ := runtime.Caller(1)
-	buf := &bytes.Buffer{}
-	// apply function name to result
-	fn := runtime.FuncForPC(pc)
-	if fn != nil {
-		buf.WriteString(fn.Name())
-		buf.WriteByte(':')
-		buf.WriteString(strconv.Itoa(line))
-	}
-	buf.WriteString(": ")
-	return &withcaller{name: buf.String(), err: err}
+	return &withStack{error: err, stack: callers()}
 }
 
-// Errorf is like fmt.Errorf but append caller name to the error
+// Errorf formats according to a format specifier and returns the string
+// as a value that satisfies error.
+// Errorf also records the stack trace at the point it was called.
 func Errorf(format string, args ...any) error {
-	pc, _, line, _ := runtime.Caller(1)
-	buf := &bytes.Buffer{}
-	// apply function name to result
-	fn := runtime.FuncForPC(pc)
-	if fn != nil {
-		buf.WriteString(fn.Name())
-		buf.WriteByte(':')
-		buf.WriteString(strconv.Itoa(line))
-	}
-	buf.WriteString(": ")
-	return &withcaller{name: buf.String(), err: fmt.Errorf(format, args...)}
-}
-
-type withcaller struct {
-	name string
-	err  error
-}
-
-func (e *withcaller) Error() string {
-	return e.name + e.err.Error()
-}
-
-func (e *withcaller) Unwrap() error {
-	return e.err
+	return &withStack{error: fmt.Errorf(format, args...), stack: callers()}
 }
