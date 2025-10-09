@@ -13,10 +13,10 @@ func Error(err error) error {
 	return &StructError{error: err, stack: callers(), msg: "no message"}
 }
 
-// Errors formats according to a format specifier and returns the string
+// ErrorWith formats according to a format specifier and returns the string
 // as a value that satisfies error.
-// Errors also records the stack trace at the point it was called.
-func Errors(format string, args ...any) error {
+// ErrorWith also records the stack trace at the point it was called.
+func ErrorWith(format string, args ...any) error {
 	return &StructError{error: ErrAnonymouse, msg: fmt.Sprintf(format, args...), stack: callers()}
 }
 
