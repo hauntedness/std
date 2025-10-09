@@ -9,15 +9,28 @@ import (
 	"strings"
 )
 
-type withStack struct {
+type StructError struct {
 	error
 	*stack
+	msg string
+}
+
+func (w *StructError) Error() string {
+	return w.error.Error() + ": " + w.msg
+}
+
+func (w *StructError) Stack() StackTrace {
+	return w.stack.StackTrace()
+}
+
+func (w *StructError) Message() string {
+	return w.msg
 }
 
 // Unwrap provides compatibility for Go 1.13 error chains.
-func (w *withStack) Unwrap() error { return w.error }
+func (w *StructError) Unwrap() error { return w.error }
 
-func (w *withStack) Format(s fmt.State, verb rune) {
+func (w *StructError) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if s.Flag('+') {
