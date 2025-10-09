@@ -1,23 +1,20 @@
-package fmts
+package he
 
 import (
 	"errors"
 	"fmt"
 )
 
-// ErrAnonymouse represent errors that doesn't have source. see [Errorf].
-var ErrAnonymouse = errors.New("error")
-
 // Error wraps an error into a StructError, recording the stack trace and a default message.
 func Error(err error) error {
-	return &StructError{error: err, stack: callers(), msg: "no message"}
+	return &StructError{error: err, stack: callers(), msg: "..."}
 }
 
-// ErrorWith formats according to a format specifier and returns the string
+// Err formats according to a format specifier and returns the string
 // as a value that satisfies error.
-// ErrorWith also records the stack trace at the point it was called.
-func ErrorWith(format string, args ...any) error {
-	return &StructError{error: ErrAnonymouse, msg: fmt.Sprintf(format, args...), stack: callers()}
+// Err also records the stack trace at the point it was called.
+func Err(format string, args ...any) error {
+	return &StructError{error: fmt.Errorf(format, args...), stack: callers(), msg: "..."}
 }
 
 // Errorf wraps an error into a StructError, appending a formatted message.
