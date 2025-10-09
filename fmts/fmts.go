@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-// AnonymouseError represent errors that doesn't have source. see [Errorf].
-var AnonymouseError = errors.New("fmts.AnonymouseError")
+// ErrAnonymouse represent errors that doesn't have source. see [Errorf].
+var ErrAnonymouse = errors.New("error")
 
 // Error wraps an error into a StructError, recording the stack trace and a default message.
 func Error(err error) error {
@@ -17,7 +17,7 @@ func Error(err error) error {
 // as a value that satisfies error.
 // Errorf also records the stack trace at the point it was called.
 func Errorf(format string, args ...any) error {
-	return &StructError{error: AnonymouseError, msg: fmt.Sprintf(format, args...), stack: callers()}
+	return &StructError{error: ErrAnonymouse, msg: fmt.Sprintf(format, args...), stack: callers()}
 }
 
 // ErrorWith wraps an error into a StructError, appending a formatted message.
