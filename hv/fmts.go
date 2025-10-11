@@ -10,10 +10,10 @@ func Err(err error) error {
 	return &Error{error: err, stack: callers(), msg: "..."}
 }
 
-// Errf formats according to a format specifier and returns the string
+// Errorx formats according to a format specifier and returns the string
 // as a value that satisfies error.
-// Errf also records the stack trace at the point it was called.
-func Errf(format string, args ...any) error {
+// Errorx also records the stack trace at the point it was called.
+func Errorx(format string, args ...any) error {
 	return &Error{error: fmt.Errorf(format, args...), stack: callers(), msg: "..."}
 }
 
