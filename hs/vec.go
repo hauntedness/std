@@ -2,7 +2,6 @@ package hs
 
 import (
 	"fmt"
-	"iter"
 	"slices"
 )
 
@@ -34,16 +33,6 @@ func NewWith[T any](data ...T) *Vec[T] {
 
 func Repeat[T any](v T, count int) *Vec[T] {
 	return &Vec[T]{data: slices.Repeat([]T{v}, count)}
-}
-
-func (v *Vec[T]) Seq() iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for i := range v.data {
-			if !yield(v.data[i]) {
-				return
-			}
-		}
-	}
 }
 
 func (v *Vec[T]) Reduce(initial T, fn func(a, b T) T) T {
