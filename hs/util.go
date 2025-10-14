@@ -22,10 +22,9 @@ func Loc[T any](values []T, start int, end int) []T {
 	if start < 0 {
 		start = length + start
 	}
-	if end <= 0 {
+	if end < 0 {
 		end = length + end
-	}
-	if end > length {
+	} else if end > length {
 		end = length
 	}
 	return values[start:end]

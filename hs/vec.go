@@ -75,6 +75,15 @@ func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
 	return New(res)
 }
 
+// Map create a new Vec, the new element depends on the results of fn.
+func (v *Vec[T]) Map(fn func(T) T) *Vec[T] {
+	res := make([]T, 0, len(v.data))
+	for i := range v.data {
+		res = append(res, fn(v.data[i]))
+	}
+	return New(res)
+}
+
 // Clone create shallow clone of v.
 //
 // underlying is [slices.Clone].
