@@ -9,28 +9,28 @@ import (
 	"strings"
 )
 
-type Error struct {
+type TracedError struct {
 	error
 	*stack
 	msg string
 }
 
-func (w *Error) Error() string {
+func (w *TracedError) Error() string {
 	return w.error.Error() + ": " + w.msg
 }
 
-func (w *Error) Stack() StackTrace {
+func (w *TracedError) Stack() StackTrace {
 	return w.stack.StackTrace()
 }
 
-func (w *Error) Message() string {
+func (w *TracedError) Message() string {
 	return w.msg
 }
 
 // Unwrap provides compatibility for Go 1.13 error chains.
-func (w *Error) Unwrap() error { return w.error }
+func (w *TracedError) Unwrap() error { return w.error }
 
-func (w *Error) Format(s fmt.State, verb rune) {
+func (w *TracedError) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if s.Flag('+') {
@@ -75,6 +75,14 @@ func (f Frame) fileAndName() (string, string) {
 	}
 	file, _ := fn.FileLine(f.pc())
 	return file, fn.Name()
+}
+
+func (f Frame) fileAndLine() (string, int) {
+	fn := runtime.FuncForPC(f.pc())
+	if fn == nil {
+		return unknown, 0
+	}
+	return fn.FileLine(f.pc())
 }
 
 // line returns the line number of source code of the
@@ -139,7 +147,8 @@ func (f Frame) MarshalText() ([]byte, error) {
 	if name == unknown {
 		return []byte(name), nil
 	}
-	return fmt.Appendf([]byte("%s %s:%d"), name, f.file(), f.line()), nil
+	file, line := f.fileAndLine()
+	return fmt.Appendf([]byte("%s %s:%d"), name, file, line), nil
 }
 
 // StackTrace is stack of Frames from innermost (newest) to outermost (oldest).

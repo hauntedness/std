@@ -5,17 +5,22 @@ import (
 	"fmt"
 )
 
+// Error construct stack [TracedError] by err and message.
+func Error(err error, message string) error {
+	return &TracedError{error: err, stack: callers(), msg: message}
+}
+
 // Err formats according to a format specifier and returns the string
 // as a value that satisfies error.
 // Err also records the stack trace at the point it was called.
 func Err(format string, args ...any) error {
-	return &Error{error: fmt.Errorf(format, args...), stack: callers(), msg: "..."}
+	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: "..."}
 }
 
-// Errf wraps an error into a [Error], appending a formatted message.
-// If the error is already a [Error], it appends the message to the existing one.
+// Errf wraps an error into a [TracedError], appending a formatted message.
+// If the error is already a [TracedError], it appends the message to the existing one.
 func Errf(err error, format string, args ...any) error {
-	var ws = &Error{}
+	var ws = &TracedError{}
 	if errors.As(err, &ws) {
 		ws.msg = ws.msg + ": " + fmt.Sprintf(format, args...)
 		return ws
