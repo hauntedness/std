@@ -30,11 +30,16 @@ func (w *TracedError) Message() string {
 // Unwrap provides compatibility for Go 1.13 error chains.
 func (w *TracedError) Unwrap() error { return w.error }
 
+// SetUnderlying replace the underlying to new one.
+func (w *TracedError) SetUnderlying(err error) {
+	w.error = err
+}
+
 func (w *TracedError) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if s.Flag('+') {
-			fmt.Fprintf(s, "%+v", w.error)
+			fmt.Fprintf(s, "%+v: %s", w.error, w.msg)
 			w.stack.Format(s, verb)
 			return
 		}
