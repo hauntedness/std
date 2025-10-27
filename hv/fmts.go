@@ -1,7 +1,6 @@
 package hv
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -20,11 +19,11 @@ func Err(format string, args ...any) error {
 // Errf wraps an error into a [TracedError], appending a formatted message.
 // If the error is already a [TracedError], it appends the message to the existing one.
 func Errf(err error, format string, args ...any) error {
-	var ws = &TracedError{}
-	if errors.As(err, &ws) {
+	if ws, ok := err.(*TracedError); ok {
 		ws.msg = ws.msg + ": " + fmt.Sprintf(format, args...)
 		return ws
 	}
+	var ws = &TracedError{}
 	ws.error = err
 	ws.stack = callers()
 	ws.msg = fmt.Sprintf(format, args...)
