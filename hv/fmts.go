@@ -23,9 +23,5 @@ func Errf(err error, format string, args ...any) error {
 		ws.msg = ws.msg + ": " + fmt.Sprintf(format, args...)
 		return ws
 	}
-	var ws = &TracedError{}
-	ws.error = err
-	ws.stack = callers()
-	ws.msg = fmt.Sprintf(format, args...)
-	return ws
+	return &TracedError{error: err, stack: callers(), msg: fmt.Sprintf(format, args...)}
 }
