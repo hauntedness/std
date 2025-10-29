@@ -33,10 +33,10 @@ func Loc[T any](values []T, start int, end int) []T {
 	return values[start:end]
 }
 
-// Tail return the slice from start to len(values) of values, it accept negative index for start.
+// Loc1 return the slice from start to len(values) of values, it accept negative index for start.
 //
-//	Loc([1,2,3], -1) --> return [2]
-func Tail[T any](values []T, start int) []T {
+//	Loc1([1,2,3], -1) --> return [2]
+func Loc1[T any](values []T, start int) []T {
 	length := len(values)
 	if start < 0 {
 		start = length + start
