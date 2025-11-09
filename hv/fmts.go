@@ -9,10 +9,15 @@ func Error(err error, message string) error {
 	return &TracedError{error: err, stack: callers(), msg: message}
 }
 
+// Err wrap err as [TracedError] with no msg.
+func Err(err error) error {
+	return &TracedError{error: err, stack: callers(), msg: "..."}
+}
+
 // Err formats according to a format specifier and returns the string
 // as a value that satisfies error.
 // Err also records the stack trace at the point it was called.
-func Err(format string, args ...any) error {
+func Errorf(format string, args ...any) error {
 	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: "..."}
 }
 
