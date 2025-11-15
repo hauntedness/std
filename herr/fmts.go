@@ -4,21 +4,13 @@ import (
 	"fmt"
 )
 
-// New formats according to a format specifier and returns the string
-// as a value that satisfies error.
-// Err also records the stack trace at the point it was called.
-func New(format string, args ...any) error {
-	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: "..."}
+// New create error with ErrNew and message, it's same to With(ErrNew, message).
+func New(message string) error {
+	return &TracedError{error: ErrNew, stack: callers(), msg: message}
 }
 
 // With wrap err as [TracedError] with no msg.
-func With(err error) error {
-	return &TracedError{error: err, stack: callers(), msg: "..."}
-}
-
-// WithMsg wrap err as [TracedError] with msg.
-//  WithMsg create a new stack.
-func WithMsg(err error, message string) error {
+func With(err error, message string) error {
 	return &TracedError{error: err, stack: callers(), msg: message}
 }
 

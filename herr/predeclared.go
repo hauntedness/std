@@ -10,4 +10,9 @@ var ErrInvalid = errors.New("value is invalid")
 // ErrUnexpected indicates that the error is unexpected but happened. It's useful for debugging.
 //
 // Functions and methods should not return this error but should instead return a wrap of this one.
-var ErrUnexpected = errors.New("unexpected internal error")
+var ErrUnexpected = errors.New("unexpected error")
+
+// ErrNew indicates that the error is Guard Clause Error. You do not need to
+//
+// Functions and methods should not return this error but should instead return a wrap of this one.
+var ErrNew = errors.New("other error")
