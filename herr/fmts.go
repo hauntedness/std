@@ -1,12 +1,13 @@
 package herr
 
 import (
+	"errors"
 	"fmt"
 )
 
 // New create error with ErrNew and message, it's same to With(ErrNew, message).
 func New(message string) error {
-	return &TracedError{error: ErrNew, stack: callers(), msg: message}
+	return &TracedError{error: errors.New(message), stack: callers(), msg: message}
 }
 
 // With wrap err as [TracedError] with no msg.
