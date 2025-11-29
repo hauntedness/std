@@ -5,9 +5,14 @@ import (
 	"fmt"
 )
 
-// New create error with ErrNew and message, it's same to With(ErrNew, message).
+// New create error with message.
 func New(message string) error {
 	return &TracedError{error: errors.New(message), stack: callers(), msg: message}
+}
+
+// Format create error with format and args.
+func Format(format string, args ...any) error {
+	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: ""}
 }
 
 // With wrap err as [TracedError] with no msg.
