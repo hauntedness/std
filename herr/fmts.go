@@ -24,7 +24,7 @@ func With(err error, message string) error {
 //  Wrap try to use existing stack. If the err is already a [TracedError], it appends the message to the existing one.
 func Wrap(err error, message string) error {
 	if ws, ok := err.(*TracedError); ok {
-		ws.msg = ws.msg + ": " + message
+		ws.msg = message + ": " + ws.msg
 		return ws
 	}
 	return &TracedError{error: err, stack: callers(), msg: message}
@@ -34,7 +34,7 @@ func Wrap(err error, message string) error {
 //  Wrapf try to use existing stack. If the err is already a [TracedError], it appends the message to the existing one.
 func Wrapf(err error, format string, args ...any) error {
 	if ws, ok := err.(*TracedError); ok {
-		ws.msg = ws.msg + ": " + fmt.Sprintf(format, args...)
+		ws.msg = fmt.Sprintf(format, args...) + ": " + ws.msg
 		return ws
 	}
 	return &TracedError{error: err, stack: callers(), msg: fmt.Sprintf(format, args...)}
