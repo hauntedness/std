@@ -16,7 +16,7 @@ type TracedError struct {
 }
 
 func (w *TracedError) Error() string {
-	return w.error.Error() + ": " + w.msg
+	return w.msg + ": " + w.error.Error()
 }
 
 func (w *TracedError) Stack() StackTrace {
