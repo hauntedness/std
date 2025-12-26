@@ -33,17 +33,6 @@ func Loc[T any](values []T, start int, end int) []T {
 	return values[start:end]
 }
 
-// Loc1 return the slice from start to len(values) of values, it accept negative index for start.
-//
-//	Loc1([1,2,3], -1) --> return [2]
-func Loc1[T any](values []T, start int) []T {
-	length := len(values)
-	if start < 0 {
-		start = length + start
-	}
-	return values[start:length]
-}
-
 func At[T any](values []T, at int) T {
 	if at < 0 {
 		return values[len(values)+at]

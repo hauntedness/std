@@ -1,4 +1,4 @@
-// package ht provide some predeclared types alias or constructor functions for convience
+// Package ht provide some predeclared types alias or constructor functions for convenience.
 package ht
 
 type Unit = struct{}
