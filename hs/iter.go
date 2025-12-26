@@ -12,7 +12,7 @@ func (v *Vec[T]) Seq() iter.Seq[T] {
 	}
 }
 
-func (v *Vec[T]) SeqRef() iter.Seq[*T] {
+func (v *Vec[T]) SeqPT() iter.Seq[*T] {
 	return func(yield func(*T) bool) {
 		for i := range v.data {
 			if !yield(&v.data[i]) {
@@ -41,7 +41,7 @@ func (v *Vec[T]) Seq2(start, end int) iter.Seq2[int, T] {
 	}
 }
 
-func (v *Vec[T]) Seq2Ref(start, end int) iter.Seq2[int, *T] {
+func (v *Vec[T]) SeqPT2(start, end int) iter.Seq2[int, *T] {
 	length := len(v.data)
 	if start < 0 {
 		start = length + start
@@ -79,7 +79,7 @@ func Seq2[T any](data []T, start, end int) iter.Seq2[int, T] {
 	}
 }
 
-func Seq2Ref[T any](data []T, start, end int) iter.Seq2[int, *T] {
+func SeqPT2[T any](data []T, start, end int) iter.Seq2[int, *T] {
 	length := len(data)
 	if start < 0 {
 		start = length + start
