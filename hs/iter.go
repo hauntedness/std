@@ -2,76 +2,57 @@ package hs
 
 import "iter"
 
+// Seq returns an iterator over the values of the vector.
 func (v *Vec[T]) Seq() iter.Seq[T] {
 	return func(yield func(T) bool) {
-		for i := range v.data {
-			if !yield(v.data[i]) {
+		data := v.data
+		for i := range data {
+			if !yield(data[i]) {
 				return
 			}
 		}
 	}
 }
 
-func (v *Vec[T]) SeqPT() iter.Seq[*T] {
+// Seqr returns an iterator over pointers to the values in the vector.
+func (v *Vec[T]) Seqr() iter.Seq[*T] {
 	return func(yield func(*T) bool) {
-		for i := range v.data {
-			if !yield(&v.data[i]) {
+		data := v.data
+		for i := range data {
+			if !yield(&data[i]) {
 				return
 			}
 		}
 	}
 }
 
-func (v *Vec[T]) Seq2(start, end int) iter.Seq2[int, T] {
-	length := len(v.data)
-	if start < 0 {
-		start = length + start
-	}
-	if end < 0 {
-		end = length + end
-	} else if end > length {
-		end = length
-	}
+// Seq2 returns an iterator that yields both the index and the value.
+func (v *Vec[T]) Seq2() iter.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
-		for i := start; i < end; i++ {
-			if !yield(i, v.data[i]) {
+		for i, value := range v.data {
+			if !yield(i, value) {
 				return
 			}
 		}
 	}
 }
 
-func (v *Vec[T]) SeqPT2(start, end int) iter.Seq2[int, *T] {
-	length := len(v.data)
-	if start < 0 {
-		start = length + start
-	}
-	if end < 0 {
-		end = length + end
-	} else if end > length {
-		end = length
-	}
+// Seqr2 returns an iterator that yields the index and a pointer to the value.
+func (v *Vec[T]) Seqr2() iter.Seq2[int, *T] {
 	return func(yield func(int, *T) bool) {
-		for i := start; i < end; i++ {
-			if !yield(i, &v.data[i]) {
+		data := v.data
+		for i := range data {
+			if !yield(i, &data[i]) {
 				return
 			}
 		}
 	}
 }
 
-func Seq2[T any](data []T, start, end int) iter.Seq2[int, T] {
-	length := len(data)
-	if start < 0 {
-		start = length + start
-	}
-	if end < 0 {
-		end = length + end
-	} else if end > length {
-		end = length
-	}
+// Seq2 returns an iterator that yields both the index and the value for a slice.
+func Seq2[T any](data []T) iter.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
-		for i := start; i < end; i++ {
+		for i := range data {
 			if !yield(i, data[i]) {
 				return
 			}
@@ -79,18 +60,10 @@ func Seq2[T any](data []T, start, end int) iter.Seq2[int, T] {
 	}
 }
 
-func SeqPT2[T any](data []T, start, end int) iter.Seq2[int, *T] {
-	length := len(data)
-	if start < 0 {
-		start = length + start
-	}
-	if end < 0 {
-		end = length + end
-	} else if end > length {
-		end = length
-	}
+// Seqr2 returns an iterator that yields the index and a pointer to the value for a slice.
+func Seqr2[T any](data []T) iter.Seq2[int, *T] {
 	return func(yield func(int, *T) bool) {
-		for i := start; i < end; i++ {
+		for i := range data {
 			if !yield(i, &data[i]) {
 				return
 			}
