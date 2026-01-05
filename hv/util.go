@@ -15,3 +15,10 @@ func OrZero[T any](v *T) T {
 	}
 	return *v
 }
+
+func OrElse[T any](v *T, supply func() *T) *T {
+	if v == nil {
+		return supply()
+	}
+	return v
+}

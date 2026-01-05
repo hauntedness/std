@@ -90,10 +90,19 @@ func (o Option[T]) OrEmpty() T {
 	return o.value
 }
 
-// ToPtr returns value if present or a nil pointer.
+// ToPtr returns pointer to underling value if present or a nil pointer.
 func (o Option[T]) ToPtr() *T {
 	if !o.isPresent {
 		return nil
+	}
+
+	return &o.value
+}
+
+// ToPtrOr returns pointer to underling value if present or a fallback pointer.
+func (o Option[T]) ToPtrOr(fallback *T) *T {
+	if !o.isPresent {
+		return fallback
 	}
 
 	return &o.value
