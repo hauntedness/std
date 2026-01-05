@@ -1,4 +1,4 @@
-// Package hf provide functions for
+// Package hf provide lambda functions for convenience.
 package hf
 
 // Supply is used as anonymous func to return the value.
