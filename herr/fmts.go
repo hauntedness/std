@@ -7,12 +7,12 @@ import (
 
 // New create error with message.
 func New(message string) error {
-	return &TracedError{error: errors.New(message), stack: callers(), msg: "err"}
+	return &TracedError{error: errors.New(message), stack: callers(), msg: "msg"}
 }
 
 // Format create error with format and args.
 func Format(format string, args ...any) error {
-	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: "err"}
+	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: "msg"}
 }
 
 // With wrap err as [TracedError] with message.
