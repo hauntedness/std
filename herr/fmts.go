@@ -15,11 +15,11 @@ func Format(format string, args ...any) error {
 	return &TracedError{error: fmt.Errorf(format, args...), stack: callers(), msg: "msg"}
 }
 
-// With wrap err as [TracedError] with message.
+// With wrap err as [TracedError] with formatted message.
 //
 // With doesn't reuse underlying TracedError if exists.
-func With(err error, message string) error {
-	return &TracedError{error: err, stack: callers(), msg: message}
+func With(err error, format string, args ...any) error {
+	return &TracedError{error: err, stack: callers(), msg: fmt.Sprintf(format, args...)}
 }
 
 // Wrap construct stack [TracedError] by err and message.
