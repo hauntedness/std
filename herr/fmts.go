@@ -22,6 +22,13 @@ func With(err error, format string, args ...any) error {
 	return &TracedError{error: err, stack: callers(), msg: fmt.Sprintf(format, args...)}
 }
 
+// WithMsg wrap err as [TracedError] with message.
+//
+// WithMsg doesn't reuse underlying TracedError if exists.
+func WithMsg(err error, message string) error {
+	return &TracedError{error: err, stack: callers(), msg: message}
+}
+
 // Wrap construct stack [TracedError] by err and message.
 //
 //	Wrap try to use existing stack. If the err is already a [TracedError], it appends the message to the existing one.
