@@ -11,12 +11,29 @@ import (
 
 type TracedError struct {
 	error
-	*stack
-	msg string
+	stack
+	mc *mc
+}
+
+// mc hold chained messages.
+type mc struct {
+	msg    string
+	parent *mc
 }
 
 func (w *TracedError) Error() string {
-	return w.msg + ": " + w.error.Error()
+	var sb strings.Builder
+	mci := w.mc
+	for {
+		if mci != nil {
+			sb.WriteString(mci.msg)
+			sb.WriteString(": ")
+			mci = mci.parent
+		} else {
+			break
+		}
+	}
+	return sb.String() + w.error.Error()
 }
 
 func (w *TracedError) Stack() StackTrace {
@@ -24,7 +41,18 @@ func (w *TracedError) Stack() StackTrace {
 }
 
 func (w *TracedError) Message() string {
-	return w.msg
+	var sb strings.Builder
+	c := w.mc
+	for {
+		if c != nil {
+			sb.WriteString(c.msg)
+			sb.WriteString(": ")
+			c = c.parent
+		} else {
+			break
+		}
+	}
+	return sb.String()
 }
 
 // Unwrap provides compatibility for Go 1.13 error chains.
@@ -39,7 +67,7 @@ func (w *TracedError) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if s.Flag('+') {
-			fmt.Fprintf(s, "%+v: %s", w.error, w.msg)
+			fmt.Fprintf(s, "%s%+v", w.Message(), w.error)
 			w.stack.Format(s, verb)
 			return
 		}
@@ -60,6 +88,8 @@ type Frame uintptr
 // multiple frames may have the same PC value.
 func (f Frame) pc() uintptr { return uintptr(f) - 1 }
 
+const unknown = "unknown"
+
 // file returns the full path to the file that contains the
 // function for this Frame's pc.
 func (f Frame) file() string {
@@ -70,8 +100,6 @@ func (f Frame) file() string {
 	file, _ := fn.FileLine(f.pc())
 	return file
 }
-
-const unknown = "unknown"
 
 func (f Frame) fileAndName() (string, string) {
 	fn := runtime.FuncForPC(f.pc())
@@ -202,12 +230,12 @@ func (st StackTrace) formatSlice(s fmt.State, verb rune) {
 // stack represents a stack of program counters.
 type stack []uintptr
 
-func (s *stack) Format(st fmt.State, verb rune) {
+func (s stack) Format(st fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		switch {
 		case st.Flag('+'):
-			for _, pc := range *s {
+			for _, pc := range s {
 				f := Frame(pc)
 				fmt.Fprintf(st, "\n%+v", f)
 			}
@@ -215,21 +243,21 @@ func (s *stack) Format(st fmt.State, verb rune) {
 	}
 }
 
-func (s *stack) StackTrace() StackTrace {
-	f := make([]Frame, len(*s))
+func (s stack) StackTrace() StackTrace {
+	f := make([]Frame, len(s))
 	for i := range f {
-		f[i] = Frame((*s)[i])
+		f[i] = Frame((s)[i])
 	}
 	return f
 }
 
-func callers() *stack {
-	const depth = 32
-	var pcs [depth]uintptr
-	n := runtime.Callers(3, pcs[:])
-	var st stack = pcs[0:n]
-	return &st
-}
+// func callers() *stack {
+// 	const depth = 32
+// 	var pcs [depth]uintptr
+// 	n := runtime.Callers(3, pcs[:])
+// 	var st stack = pcs[0:n]
+// 	return &st
+// }
 
 // funcname removes the path prefix component of a function's name reported by func.Name().
 func funcname(name string) string {
