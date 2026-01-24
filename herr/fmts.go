@@ -46,10 +46,13 @@ func WithMsg(err error, message string) error {
 
 // Wrap construct stack [TracedError] by err and message.
 //
-//	Wrap try to use existing stack. If the err is already a [TracedError], it appends the message to the existing one.
+//	Wrap try to use existing stack and err.
+//
+// If the err is already a [TracedError], it mutate its message and return the original err.
 func Wrap(err error, message string) error {
 	if ws, ok := err.(*TracedError); ok {
-		return &TracedError{error: err, stack: ws.stack, mc: &mc{msg: message, parent: ws.mc}}
+		ws.mc = &mc{msg: message, parent: ws.mc}
+		return ws
 	}
 	var pcs = make([]uintptr, depth)
 	n := runtime.Callers(2, pcs)
@@ -59,10 +62,13 @@ func Wrap(err error, message string) error {
 
 // Wrapf wraps an error into a [TracedError], appending a formatted message.
 //
-//	Wrapf try to use existing stack. If the err is already a [TracedError], it appends the message to the existing one.
+//	Wrapf try to use existing stack and err.
+//
+// If the err is already a [TracedError], it mutate its message and return the original err.
 func Wrapf(err error, format string, args ...any) error {
 	if ws, ok := err.(*TracedError); ok {
-		return &TracedError{error: err, stack: ws.stack, mc: &mc{msg: fmt.Sprintf(format, args...), parent: ws.mc}}
+		ws.mc = &mc{msg: fmt.Sprintf(format, args...), parent: ws.mc}
+		return ws
 	}
 	var pcs = make([]uintptr, depth)
 	n := runtime.Callers(2, pcs)
