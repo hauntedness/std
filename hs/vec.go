@@ -26,7 +26,7 @@ func Of[T any](data ...T) *Vec[T] {
 	return &Vec[T]{data: data}
 }
 
-// Deprecated: use Of
+// NewWith alias of Of
 func NewWith[T any](data ...T) *Vec[T] {
 	return Of(data...)
 }
@@ -47,9 +47,8 @@ func (v *Vec[T]) Data() []T {
 }
 
 // Append append data to v.
-// see [slices.Concat].
 func (v *Vec[T]) Append(data ...T) *Vec[T] {
-	v.data = slices.Concat(v.data, data)
+	v.data = append(v.data, data...)
 	return v
 }
 

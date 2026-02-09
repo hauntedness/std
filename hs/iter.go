@@ -49,7 +49,18 @@ func (v *Vec[T]) Seqr2() iter.Seq2[int, *T] {
 	}
 }
 
-// Seq2 returns an iterator that yields both the index and the value for a slice.
+// Seq returns an iterator that yields each value from data.
+func Seq[T any](data []T) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for i := range data {
+			if !yield(data[i]) {
+				return
+			}
+		}
+	}
+}
+
+// Seq2 returns an iterator that yields both the index and the value from data.
 func Seq2[T any](data []T) iter.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		for i := range data {
@@ -60,7 +71,7 @@ func Seq2[T any](data []T) iter.Seq2[int, T] {
 	}
 }
 
-// Seqr2 returns an iterator that yields the index and a pointer to the value for a slice.
+// Seqr2 returns an iterator that yields the index and a pointer to the value from data.
 func Seqr2[T any](data []T) iter.Seq2[int, *T] {
 	return func(yield func(int, *T) bool) {
 		for i := range data {
