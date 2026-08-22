@@ -122,7 +122,30 @@ func (v *Vec[T]) Clip() *Vec[T] {
 // DistinctBy return distincted values based on func key.
 //
 // it doesn't modify the original slice.
-func (v *Vec[T]) DistinctBy[K comparable](key func(e *T) K) *Vec[T] {
+func (v *Vec[T]) DistinctBy[K comparable](key func(e T) K) *Vec[T] {
+	if len(v.data) == 0 {
+		return &Vec[T]{data: nil}
+	}
+	// Use a map to track seen elements
+	seen := make(map[K]struct{})
+	res := make([]T, 0, len(v.data))
+
+	for _, val := range v.data {
+		k := key(val)
+		if _, ok := seen[k]; !ok {
+			seen[k] = struct{}{}
+
+			res = append(res, val)
+		}
+	}
+
+	return &Vec[T]{data: res}
+}
+
+// DistinctByKey return distincted values based on func key.
+//
+// it doesn't modify the original slice.
+func (v *Vec[T]) DistinctByKey[K comparable](key func(e *T) K) *Vec[T] {
 	if len(v.data) == 0 {
 		return &Vec[T]{data: nil}
 	}
