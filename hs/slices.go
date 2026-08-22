@@ -8,6 +8,7 @@ func Map[T any, R any](values []T, fn func(T) R) []R {
 	for i := range values {
 		r[i] = fn(values[i])
 	}
+
 	return r
 }
 
@@ -21,6 +22,7 @@ func Pipe[T any, R any](values []T, fn func(T) (R, bool)) []R {
 			r = append(r, v)
 		}
 	}
+
 	return r
 }
 
@@ -34,6 +36,7 @@ func PipeVec[T any, R any](values *Vec[T], fn func(T) (R, bool)) *Vec[R] {
 			r = append(r, v)
 		}
 	}
+
 	return &Vec[R]{data: r}
 }
 
@@ -72,6 +75,7 @@ func DistinctBy[T any, K comparable](v []T, key func(*T) K) []T {
 		k := key(&val)
 		if _, ok := seen[k]; !ok {
 			seen[k] = struct{}{}
+
 			res = append(res, val)
 		}
 	}

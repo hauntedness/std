@@ -26,7 +26,7 @@ func Of[T any](data ...T) *Vec[T] {
 	return &Vec[T]{data: data}
 }
 
-// NewWith alias of Of
+// NewWith alias of Of.
 func NewWith[T any](data ...T) *Vec[T] {
 	return Of(data...)
 }
@@ -39,6 +39,7 @@ func (v *Vec[T]) Reduce(initial T, fn func(a, b T) T) T {
 	for i := range v.data {
 		initial = fn(initial, v.data[i])
 	}
+
 	return initial
 }
 
@@ -53,22 +54,24 @@ func (v *Vec[T]) Append(data ...T) *Vec[T] {
 }
 
 // Pipe create a new Vec, the new element depends on the results of fn.
-func (v *Vec[T]) Pipe(fn func(T) (T, bool)) *Vec[T] {
-	res := make([]T, 0, len(v.data))
+func (v *Vec[T]) Pipe[R any](fn func(T) (R, bool)) *Vec[R] {
+	res := make([]R, 0, len(v.data))
 	for i := range v.data {
 		if nv, ok := fn(v.data[i]); ok {
 			res = append(res, nv)
 		}
 	}
+
 	return New(res)
 }
 
 // Map create a new Vec, the new element depends on the results of fn.
-func (v *Vec[T]) Map(fn func(T) T) *Vec[T] {
-	res := make([]T, 0, len(v.data))
+func (v *Vec[T]) Map[R any](fn func(T) R) *Vec[R] {
+	res := make([]R, 0, len(v.data))
 	for i := range v.data {
 		res = append(res, fn(v.data[i]))
 	}
+
 	return New(res)
 }
 
@@ -123,13 +126,16 @@ func (v *Vec[T]) Distinct(eq func(a T, b T) bool) *Vec[T] {
 	if len(v.data) == 0 {
 		return &Vec[T]{}
 	}
+
 	data := slices.Clone(v.data)
 	slices.SortFunc(data, func(a T, b T) int {
 		if eq(a, b) {
 			return 0
 		}
+
 		return -1
 	})
+
 	return &Vec[T]{data: slices.CompactFunc(data, eq)}
 }
 

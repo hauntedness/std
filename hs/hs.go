@@ -25,11 +25,13 @@ func Loc[T any](values []T, start int, end int) []T {
 	if start < 0 {
 		start = length + start
 	}
+
 	if end < 0 {
 		end = length + end
 	} else if end > length {
 		end = length
 	}
+
 	return values[start:end]
 }
 
@@ -37,5 +39,6 @@ func At[T any](values []T, at int) T {
 	if at < 0 {
 		return values[len(values)+at]
 	}
+
 	return values[at]
 }
