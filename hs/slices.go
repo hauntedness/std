@@ -26,20 +26,6 @@ func Pipe[T any, R any](values []T, fn func(T) (R, bool)) []R {
 	return r
 }
 
-// PipeVec is filter + map from *Vec[T] to *Vec[R].
-//
-// PipeVec does NOT removes unused capacity, call [Clip] by yourself if needed.
-func PipeVec[T any, R any](values *Vec[T], fn func(T) (R, bool)) *Vec[R] {
-	r := make([]R, 0, len(values.data))
-	for i := range values.data {
-		if v, ok := fn(values.data[i]); ok {
-			r = append(r, v)
-		}
-	}
-
-	return &Vec[R]{data: r}
-}
-
 // Contains Contains reports whether value is present in values.
 func Contains[T comparable](value T, values ...T) bool {
 	return slices.Contains(values, value)

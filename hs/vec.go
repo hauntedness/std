@@ -119,24 +119,27 @@ func (v *Vec[T]) Clip() *Vec[T] {
 	return v
 }
 
-// Distinct return distincted values based on func eq.
+// DistinctBy return distincted values based on func key.
 //
 // it doesn't modify the original slice.
-func (v *Vec[T]) Distinct(eq func(a T, b T) bool) *Vec[T] {
+func (v *Vec[T]) DistinctBy[K comparable](key func(e *T) K) *Vec[T] {
 	if len(v.data) == 0 {
-		return &Vec[T]{}
+		return &Vec[T]{data: nil}
+	}
+	// Use a map to track seen elements
+	seen := make(map[K]struct{})
+	res := make([]T, 0, len(v.data))
+
+	for _, val := range v.data {
+		k := key(&val)
+		if _, ok := seen[k]; !ok {
+			seen[k] = struct{}{}
+
+			res = append(res, val)
+		}
 	}
 
-	data := slices.Clone(v.data)
-	slices.SortFunc(data, func(a T, b T) int {
-		if eq(a, b) {
-			return 0
-		}
-
-		return -1
-	})
-
-	return &Vec[T]{data: slices.CompactFunc(data, eq)}
+	return &Vec[T]{data: res}
 }
 
 // Index IndexFunc returns the first index i satisfying eq(elem, input), or -1 if none do.
