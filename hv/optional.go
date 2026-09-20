@@ -1,4 +1,4 @@
-// github.com/hauntedness/std/hv is a fork of github.com/samber/mo/option.
+// Package hv is a fork of github.com/samber/mo/option.
 package hv
 
 import (
@@ -21,9 +21,8 @@ func Some[T any](value T) Option[T] {
 
 // None builds an Option when value is absent.
 func None[T any]() Option[T] {
-	return Option[T]{
-		isPresent: false,
-	}
+	//nolint:exhaustruct_v5
+	return Option[T]{isPresent: false}
 }
 
 // From builds a Some Option when second argument is true, or None.
@@ -31,6 +30,7 @@ func From[T any](value T, ok bool) Option[T] {
 	if ok {
 		return Some(value)
 	}
+
 	return None[T]()
 }
 
@@ -39,6 +39,7 @@ func FromPtr[T any](value *T) Option[T] {
 	if value != nil {
 		return Some(*value)
 	}
+
 	return None[T]()
 }
 
@@ -61,28 +62,38 @@ func (o Option[T]) IsAbsent() bool {
 
 // Get returns value and presence.
 func (o Option[T]) Get() (T, bool) {
-	if !o.isPresent {
-		return *new(T), false
+	if o.isPresent {
+		return o.value, true
 	}
 
-	return o.value, true
+	return *new(T), false
 }
 
 // MustGet panic if value is not present.
 func (o Option[T]) MustGet() T {
-	if !o.isPresent {
-		panic("value is not present")
+	if o.isPresent {
+		return o.value
 	}
-	return o.value
+
+	panic("value is not present")
+}
+
+// Map returns value if present or default value.
+func (o Option[T]) Map[R any](fn func(T) R) Option[R] {
+	if o.isPresent {
+		return Some(fn(o.value))
+	}
+
+	return None[R]()
 }
 
 // OrElse returns value if present or default value.
 func (o Option[T]) OrElse(fallback T) T {
-	if !o.isPresent {
-		return fallback
+	if o.isPresent {
+		return o.value
 	}
 
-	return o.value
+	return fallback
 }
 
 // OrEmpty returns value if present or empty value.
@@ -92,20 +103,20 @@ func (o Option[T]) OrEmpty() T {
 
 // ToPtr returns pointer to underling value if present or a nil pointer.
 func (o Option[T]) ToPtr() *T {
-	if !o.isPresent {
-		return nil
+	if o.isPresent {
+		return &o.value
 	}
 
-	return &o.value
+	return nil
 }
 
 // ToPtrOr returns pointer to underling value if present or a fallback pointer.
 func (o Option[T]) ToPtrOr(fallback *T) *T {
-	if !o.isPresent {
-		return fallback
+	if o.isPresent {
+		return &o.value
 	}
 
-	return &o.value
+	return fallback
 }
 
 // MarshalJSON encodes Option into json.
@@ -131,6 +142,7 @@ func (o *Option[T]) UnmarshalJSON(b []byte) error {
 	}
 
 	o.isPresent = true
+
 	return nil
 }
 
@@ -174,17 +186,20 @@ func (o *Option[T]) UnmarshalBinary(data []byte) error {
 	if data[0] == 0 {
 		o.isPresent = false
 		o.value = *new(T)
+
 		return nil
 	}
 
 	buf := bytes.NewBuffer(data[1:])
 	dec := gob.NewDecoder(buf)
+
 	err := dec.Decode(&o.value)
 	if err != nil {
 		return err
 	}
 
 	o.isPresent = true
+
 	return nil
 }
 
@@ -203,6 +218,7 @@ func (o *Option[T]) Scan(src any) error {
 	if src == nil {
 		o.isPresent = false
 		o.value = *new(T)
+
 		return nil
 	}
 
@@ -215,6 +231,7 @@ func (o *Option[T]) Scan(src any) error {
 
 		o.isPresent = true
 		o.value = t
+
 		return nil
 	}
 
@@ -222,6 +239,7 @@ func (o *Option[T]) Scan(src any) error {
 		if v, ok := av.(T); ok {
 			o.isPresent = true
 			o.value = v
+
 			return nil
 		}
 	}
@@ -243,11 +261,14 @@ func (o *Option[T]) scanConvertValue(src any) error {
 	// will return immediately for v that is already a Value, even if it is a different
 	// Value type than the one we expect here.
 	var st sql.Null[T]
+
 	err := st.Scan(src)
 	if err != nil {
 		return err
 	}
+
 	o.isPresent = true
 	o.value = st.V
+
 	return nil
 }

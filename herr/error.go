@@ -12,6 +12,7 @@ import (
 type TracedError struct {
 	error
 	stack
+
 	mc *mc
 }
 
@@ -23,35 +24,41 @@ type mc struct {
 
 func (w *TracedError) Error() string {
 	var sb strings.Builder
+
 	mci := w.mc
 	for {
 		if mci != nil {
 			sb.WriteString(mci.msg)
 			sb.WriteString(": ")
+
 			mci = mci.parent
 		} else {
 			break
 		}
 	}
+
 	return sb.String() + w.error.Error()
 }
 
 func (w *TracedError) Stack() StackTrace {
-	return w.stack.StackTrace()
+	return w.StackTrace()
 }
 
 func (w *TracedError) Message() string {
 	var sb strings.Builder
+
 	c := w.mc
 	for {
 		if c != nil {
 			sb.WriteString(c.msg)
 			sb.WriteString(": ")
+
 			c = c.parent
 		} else {
 			break
 		}
 	}
+
 	return sb.String()
 }
 
@@ -69,8 +76,10 @@ func (w *TracedError) Format(s fmt.State, verb rune) {
 		if s.Flag('+') {
 			fmt.Fprintf(s, "%s%+v", w.Message(), w.error)
 			w.stack.Format(s, verb)
+
 			return
 		}
+
 		fallthrough
 	case 's':
 		io.WriteString(s, w.Error())
@@ -97,7 +106,9 @@ func (f Frame) file() string {
 	if fn == nil {
 		return unknown
 	}
+
 	file, _ := fn.FileLine(f.pc())
+
 	return file
 }
 
@@ -106,7 +117,9 @@ func (f Frame) fileAndName() (string, string) {
 	if fn == nil {
 		return unknown, unknown
 	}
+
 	file, _ := fn.FileLine(f.pc())
+
 	return file, fn.Name()
 }
 
@@ -115,6 +128,7 @@ func (f Frame) fileAndLine() (string, int) {
 	if fn == nil {
 		return unknown, 0
 	}
+
 	return fn.FileLine(f.pc())
 }
 
@@ -125,7 +139,9 @@ func (f Frame) line() int {
 	if fn == nil {
 		return 0
 	}
+
 	_, line := fn.FileLine(f.pc())
+
 	return line
 }
 
@@ -135,6 +151,7 @@ func (f Frame) name() string {
 	if fn == nil {
 		return unknown
 	}
+
 	return fn.Name()
 }
 
@@ -180,7 +197,9 @@ func (f Frame) MarshalText() ([]byte, error) {
 	if name == unknown {
 		return []byte(name), nil
 	}
+
 	file, line := f.fileAndLine()
+
 	return fmt.Appendf([]byte("%s %s:%d"), name, file, line), nil
 }
 
@@ -218,12 +237,15 @@ func (st StackTrace) Format(s fmt.State, verb rune) {
 // Frame, only valid when called with '%s' or '%v'.
 func (st StackTrace) formatSlice(s fmt.State, verb rune) {
 	io.WriteString(s, "[")
+
 	for i, f := range st {
 		if i > 0 {
 			io.WriteString(s, " ")
 		}
+
 		f.Format(s, verb)
 	}
+
 	io.WriteString(s, "]")
 }
 
@@ -248,6 +270,7 @@ func (s stack) StackTrace() StackTrace {
 	for i := range f {
 		f[i] = Frame((s)[i])
 	}
+
 	return f
 }
 
@@ -264,5 +287,6 @@ func funcname(name string) string {
 	i := strings.LastIndex(name, "/")
 	name = name[i+1:]
 	i = strings.Index(name, ".")
+
 	return name[i+1:]
 }
