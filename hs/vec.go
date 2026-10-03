@@ -130,12 +130,12 @@ func (v *Vec[T]) DistinctBy[K comparable](key func(e T) K) *Vec[T] {
 	seen := make(map[K]struct{})
 	res := make([]T, 0, len(v.data))
 
-	for _, val := range v.data {
-		k := key(val)
+	for i := range v.data {
+		k := key(v.data[i])
 		if _, ok := seen[k]; !ok {
 			seen[k] = struct{}{}
 
-			res = append(res, val)
+			res = append(res, v.data[i])
 		}
 	}
 
@@ -153,12 +153,12 @@ func (v *Vec[T]) DistinctByKey[K comparable](key func(e *T) K) *Vec[T] {
 	seen := make(map[K]struct{})
 	res := make([]T, 0, len(v.data))
 
-	for _, val := range v.data {
-		k := key(&val)
+	for i := range v.data {
+		k := key(&v.data[i])
 		if _, ok := seen[k]; !ok {
 			seen[k] = struct{}{}
 
-			res = append(res, val)
+			res = append(res, v.data[i])
 		}
 	}
 

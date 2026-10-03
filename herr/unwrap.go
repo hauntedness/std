@@ -30,21 +30,29 @@ func Match(err error, fn func(err error) bool) bool {
 		if fn(err) {
 			return true
 		}
-		switch x := err.(type) {
-		case interface{ Unwrap() error }:
-			err = x.Unwrap()
-			if err == nil {
+
+		{
+			var (
+				x  interface{ Unwrap() error }
+				x1 interface{ Unwrap() []error }
+			)
+			switch {
+			case errors.As(err, &x):
+				err = x.Unwrap()
+				if err == nil {
+					return false
+				}
+			case errors.As(err, &x1):
+				for _, err := range x1.Unwrap() {
+					if Match(err, fn) {
+						return true
+					}
+				}
+
+				return false
+			default:
 				return false
 			}
-		case interface{ Unwrap() []error }:
-			for _, err := range x.Unwrap() {
-				if Match(err, fn) {
-					return true
-				}
-			}
-			return false
-		default:
-			return false
 		}
 	}
 }

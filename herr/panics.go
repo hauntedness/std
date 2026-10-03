@@ -1,4 +1,4 @@
-package just
+package herr
 
 import (
 	"fmt"
@@ -15,7 +15,9 @@ func Try[T any](f func() T) (t T, err error) {
 			}
 		}
 	}()
+
 	t = f()
+
 	return t, err
 }
 
@@ -30,41 +32,28 @@ func TryDo(f func()) (err error) {
 			}
 		}
 	}()
+
 	f()
+
 	return err
 }
 
-// TryGo spawn a new goroutine and recover panic from f and send the recovered value or nil to error chan.
-func TryGo(f func()) <-chan error {
-	ch := make(chan error, 1)
-	go func() {
-		defer func() {
-			if v := recover(); v != nil {
-				if e, ok := v.(error); ok {
-					ch <- e
-				} else {
-					ch <- &PanicError{v}
-				}
-			} else {
-				ch <- nil
-			}
-			close(ch)
-		}()
-		f()
-	}()
-	return ch
+// Panicf panic with formated error instead of interface{}.
+func Panicf(format string, a ...any) {
+	panic(fmt.Errorf(format, a...))
 }
 
-// Must Must get value with no error or else panic.
+// Must Must get value when no error or else panic.
 func Must[T any](value T, err error) T {
 	if err != nil {
 		panic(err)
 	}
+
 	return value
 }
 
-// Check check no error or else panic.
-func Check(err error) {
+// MustNil check no error or else panic.
+func MustNil(err error) {
 	if err != nil {
 		panic(err)
 	}

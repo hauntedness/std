@@ -90,10 +90,10 @@ func TestMatch_JoinedErrors(t *testing.T) {
 
 	// Check matching custom error by type and property
 	if !herr.Match(joined, func(e error) bool {
-		var ce *customError
-		if errors.As(e, &ce) {
+		if ce, ok := errors.AsType[*customError](e); ok {
 			return ce.code == 404
 		}
+
 		return false
 	}) {
 		t.Fatal("expected Match to find customError with code 404 in joined errors")
