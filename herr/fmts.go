@@ -62,8 +62,8 @@ func WithMsg(err error, message string) error {
 //
 // If the err is already a [TracedError], it mutate its message and return the original err.
 func Wrap(err error, message string) error {
-	ws := &TracedError{}
-	if errors.As(err, &ws) {
+	//nolint:all //do not use errors.As this is only for direct fast path.
+	if ws, ok := err.(*TracedError); ok {
 		ws.mc = &mc{msg: message, parent: ws.mc}
 		return ws
 	}
@@ -83,8 +83,8 @@ func Wrap(err error, message string) error {
 //
 // If the err is already a [TracedError], it mutate its message and return the original err.
 func Wrapf(err error, format string, args ...any) error {
-	ws := &TracedError{}
-	if errors.As(err, &ws) {
+	//nolint:all //do not use errors.As this is only for direct fast path.
+	if ws, ok := err.(*TracedError); ok {
 		ws.mc = &mc{msg: fmt.Sprintf(format, args...), parent: ws.mc}
 		return ws
 	}

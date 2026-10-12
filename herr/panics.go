@@ -38,11 +38,6 @@ func TryDo(f func()) (err error) {
 	return err
 }
 
-// Panicf panic with formated error instead of interface{}.
-func Panicf(format string, a ...any) {
-	panic(fmt.Errorf(format, a...))
-}
-
 // Must Must get value when no error or else panic.
 func Must[T any](value T, err error) T {
 	if err != nil {
