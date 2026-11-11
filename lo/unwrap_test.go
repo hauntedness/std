@@ -48,7 +48,7 @@ func TestMatch_SingleError(t *testing.T) {
 	}
 }
 
-func TestMatch_TracedErrorChain(t *testing.T) {
+func TestMatch_TracedChainedError(t *testing.T) {
 	root := errors.New("disk full")
 	err1 := lo.WrapError(root, "failed to write log")
 	err2 := lo.Error(err1, "service worker aborted")

@@ -4,7 +4,7 @@ import "errors"
 
 // Unwrap try to unwrap the err in [*Error].
 func Unwrap(err error) error {
-	te := &ErrorChain{}
+	te := &ChainedError{}
 	if errors.As(err, &te) {
 		return te.error
 	}
