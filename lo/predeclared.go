@@ -1,4 +1,4 @@
-package herr
+package lo
 
 import "errors"
 

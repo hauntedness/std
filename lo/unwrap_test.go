@@ -1,4 +1,4 @@
-package herr_test
+package lo_test
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hauntedness/std/herr"
+	"github.com/hauntedness/std/lo"
 )
 
 type customError struct {
@@ -20,12 +20,12 @@ func (c *customError) Error() string {
 }
 
 func TestMatch_Nil(t *testing.T) {
-	if herr.Match(nil, func(err error) bool { return true }) {
+	if lo.Match(nil, func(err error) bool { return true }) {
 		t.Fatal("expected Match with nil err to return false")
 	}
 
 	err := errors.New("some error")
-	if herr.Match(err, nil) {
+	if lo.Match(err, nil) {
 		t.Fatal("expected Match with nil fn to return false")
 	}
 }
@@ -33,14 +33,14 @@ func TestMatch_Nil(t *testing.T) {
 func TestMatch_SingleError(t *testing.T) {
 	err := errors.New("connection reset by peer")
 
-	matched := herr.Match(err, func(e error) bool {
+	matched := lo.Match(err, func(e error) bool {
 		return strings.Contains(e.Error(), "connection reset")
 	})
 	if !matched {
 		t.Fatalf("expected Match to find 'connection reset', but got false")
 	}
 
-	notMatched := herr.Match(err, func(e error) bool {
+	notMatched := lo.Match(err, func(e error) bool {
 		return strings.Contains(e.Error(), "timeout")
 	})
 	if notMatched {
@@ -50,21 +50,21 @@ func TestMatch_SingleError(t *testing.T) {
 
 func TestMatch_TracedErrorChain(t *testing.T) {
 	root := errors.New("disk full")
-	err1 := herr.With(root, "failed to write log")
-	err2 := herr.Wrap(err1, "service worker aborted")
+	err1 := lo.WrapError(root, "failed to write log")
+	err2 := lo.Error(err1, "service worker aborted")
 
 	// Match root error
-	if !herr.Match(err2, func(e error) bool { return errors.Is(e, root) }) {
+	if !lo.Match(err2, func(e error) bool { return errors.Is(e, root) }) {
 		t.Fatal("expected Match to find root error in TracedError chain")
 	}
 
 	// Match middle error message
-	if !herr.Match(err2, func(e error) bool { return strings.Contains(e.Error(), "failed to write log") }) {
+	if !lo.Match(err2, func(e error) bool { return strings.Contains(e.Error(), "failed to write log") }) {
 		t.Fatal("expected Match to find middle error in TracedError chain")
 	}
 
 	// Non-matching condition
-	if herr.Match(err2, func(e error) bool { return strings.Contains(e.Error(), "unrelated") }) {
+	if lo.Match(err2, func(e error) bool { return strings.Contains(e.Error(), "unrelated") }) {
 		t.Fatal("expected Match to return false for unrelated predicate")
 	}
 }
@@ -73,7 +73,7 @@ func TestMatch_FmtWrapped(t *testing.T) {
 	base := io.ErrUnexpectedEOF
 	wrapped := fmt.Errorf("read payload: %w", base)
 
-	if !herr.Match(wrapped, func(e error) bool { return errors.Is(e, io.ErrUnexpectedEOF) }) {
+	if !lo.Match(wrapped, func(e error) bool { return errors.Is(e, io.ErrUnexpectedEOF) }) {
 		t.Fatal("expected Match to find wrapped io.ErrUnexpectedEOF")
 	}
 }
@@ -84,12 +84,12 @@ func TestMatch_JoinedErrors(t *testing.T) {
 	joined := errors.Join(errA, errB)
 
 	// Check matching errA
-	if !herr.Match(joined, func(e error) bool { return e.Error() == "task A failed" }) {
+	if !lo.Match(joined, func(e error) bool { return e.Error() == "task A failed" }) {
 		t.Fatal("expected Match to find task A in joined errors")
 	}
 
 	// Check matching custom error by type and property
-	if !herr.Match(joined, func(e error) bool {
+	if !lo.Match(joined, func(e error) bool {
 		if ce, ok := errors.AsType[*customError](e); ok {
 			return ce.code == 404
 		}
@@ -100,7 +100,7 @@ func TestMatch_JoinedErrors(t *testing.T) {
 	}
 
 	// Non-matching
-	if herr.Match(joined, func(e error) bool { return strings.Contains(e.Error(), "task C") }) {
+	if lo.Match(joined, func(e error) bool { return strings.Contains(e.Error(), "task C") }) {
 		t.Fatal("expected Match to return false for non-existent error")
 	}
 }

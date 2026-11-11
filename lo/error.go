@@ -1,4 +1,4 @@
-package herr
+package lo
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type TracedError struct {
+type ErrorChain struct {
 	error
 	stack
 
@@ -22,7 +22,7 @@ type mc struct {
 	parent *mc
 }
 
-func (w *TracedError) Error() string {
+func (w *ErrorChain) Error() string {
 	var sb strings.Builder
 
 	mci := w.mc
@@ -40,11 +40,11 @@ func (w *TracedError) Error() string {
 	return sb.String() + w.error.Error()
 }
 
-func (w *TracedError) Stack() StackTrace {
+func (w *ErrorChain) Stack() StackTrace {
 	return w.StackTrace()
 }
 
-func (w *TracedError) Message() string {
+func (w *ErrorChain) Message() string {
 	var sb strings.Builder
 
 	c := w.mc
@@ -63,14 +63,14 @@ func (w *TracedError) Message() string {
 }
 
 // Unwrap provides compatibility for Go 1.13 error chains.
-func (w *TracedError) Unwrap() error { return w.error }
+func (w *ErrorChain) Unwrap() error { return w.error }
 
 // SetUnderlying replace the underlying to new one.
-func (w *TracedError) SetUnderlying(err error) {
+func (w *ErrorChain) SetUnderlying(err error) {
 	w.error = err
 }
 
-func (w *TracedError) Format(s fmt.State, verb rune) {
+func (w *ErrorChain) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if s.Flag('+') {

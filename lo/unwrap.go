@@ -1,10 +1,10 @@
-package herr
+package lo
 
 import "errors"
 
-// Unwrap try to unwrap the err in [*TracedError].
+// Unwrap try to unwrap the err in [*Error].
 func Unwrap(err error) error {
-	te := &TracedError{}
+	te := &ErrorChain{}
 	if errors.As(err, &te) {
 		return te.error
 	}
@@ -26,33 +26,36 @@ func Match(err error, fn func(err error) bool) bool {
 		return false
 	}
 
+	type Unwrapable = interface {
+		error
+		Unwrap() error
+	}
+
+	type Unwrapable2 = interface {
+		error
+		Unwrap() []error
+	}
+
 	for {
 		if fn(err) {
 			return true
 		}
 
-		{
-			var (
-				x  interface{ Unwrap() error }
-				x1 interface{ Unwrap() []error }
-			)
-			switch {
-			case errors.As(err, &x):
-				err = x.Unwrap()
-				if err == nil {
-					return false
-				}
-			case errors.As(err, &x1):
-				for _, err := range x1.Unwrap() {
-					if Match(err, fn) {
-						return true
-					}
-				}
-
-				return false
-			default:
+		if x, ok := errors.AsType[Unwrapable](err); ok {
+			err = x.Unwrap()
+			if err == nil {
 				return false
 			}
+		} else if x1, ok := errors.AsType[Unwrapable2](err); ok {
+			for _, err := range x1.Unwrap() {
+				if Match(err, fn) {
+					return true
+				}
+			}
+
+			return false
+		} else {
+			return false
 		}
 	}
 }
