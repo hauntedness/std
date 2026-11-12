@@ -1,4 +1,4 @@
-package lo
+package lang
 
 import (
 	"errors"
@@ -30,10 +30,10 @@ func NewErrorf(format string, args ...any) error {
 	return &ChainedError{error: fmt.Errorf(format, args...), stack: st, mc: nil}
 }
 
-// WrapErrorf wrap err as [ChainedError] with formatted message.
+// ErrorfWith wrap err as [ChainedError] with formatted message.
 //
-// WrapErrorf doesn't reuse underlying Error if exists.
-func WrapErrorf(err error, format string, args ...any) error {
+// ErrorfWith doesn't reuse underlying Error if exists.
+func ErrorfWith(err error, format string, args ...any) error {
 	var pcs = make([]uintptr, depth)
 
 	n := runtime.Callers(2, pcs)
@@ -43,10 +43,10 @@ func WrapErrorf(err error, format string, args ...any) error {
 	return &ChainedError{error: err, stack: st, mc: &mc{msg: fmt.Sprintf(format, args...)}}
 }
 
-// WrapError wrap err as [ChainedError] with message.
+// ErrorWith wrap err as [ChainedError] with message.
 //
-// WrapError doesn't reuse underlying ChainedError if exists.
-func WrapError(err error, message string) error {
+// ErrorWith doesn't reuse underlying ChainedError if exists.
+func ErrorWith(err error, message string) error {
 	var pcs = make([]uintptr, depth)
 
 	n := runtime.Callers(2, pcs)

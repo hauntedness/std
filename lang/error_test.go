@@ -1,16 +1,16 @@
-package lo_test
+package lang_test
 
 import (
 	"log"
 	"testing"
 
-	"github.com/hauntedness/std/lo"
+	"github.com/hauntedness/std/lang"
 )
 
 func TestTracedError_Error(t *testing.T) {
-	err1 := lo.NewError("error1")
-	err2 := lo.Error(err1, "error2")
-	err3 := lo.Error(err2, "error3")
+	err1 := lang.NewError("error1")
+	err2 := lang.Error(err1, "error2")
+	err3 := lang.Error(err2, "error3")
 
 	actual := err3.Error()
 	if actual != "error3: error2: error1" {
